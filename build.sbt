@@ -31,10 +31,20 @@ lazy val scalaDebuggerTest = project
 lazy val scalaDebuggerMacros = project
   .in(file("scala-debugger-macros"))
   .settings(Common.settings: _*)
-  .settings(Macro.settings: _*)
+  .settings(Macros.settings: _*)
   .settings(Seq(
     name := "scala-debugger-macros"
   ))
+
+lazy val scalaDebuggerRepl = project
+  .in(file("scala-debugger-repl"))
+  .configs(IntegrationTest)
+  .settings(Common.settings: _*)
+  .settings(Repl.settings: _*)
+  .settings(Seq(
+    name := "scala-debugger-repl"
+  ))
+  .dependsOn(scalaDebuggerApi % "compile->compile;test->compile;it->compile")
 
 //
 // MAIN PROJECT CONFIGURATION
@@ -54,6 +64,7 @@ lazy val root = project
   ).aggregate(
     scalaDebuggerApi,
     scalaDebuggerTest,
-    scalaDebuggerMacros
+    scalaDebuggerMacros,
+    scalaDebuggerRepl
   )
 

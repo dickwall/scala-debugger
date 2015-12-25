@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 
-object Macro {
+object Macros {
   /** Version used for paradise and quasiquotes. */
   val macroVersion = "2.1.0"
 

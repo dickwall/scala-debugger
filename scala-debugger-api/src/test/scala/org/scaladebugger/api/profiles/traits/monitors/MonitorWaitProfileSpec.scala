@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.monitors
 
 import com.sun.jdi.event.MonitorWaitEvent
+import org.scaladebugger.api.lowlevel.monitors.MonitorWaitRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -26,6 +27,8 @@ class MonitorWaitProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[MonitorWaitEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def monitorWaitRequests: Seq[MonitorWaitRequestInfo] = ???
   }
 
   private val failMonitorWaitProfile = new Object with MonitorWaitProfile {
@@ -34,6 +37,8 @@ class MonitorWaitProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[MonitorWaitEventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def monitorWaitRequests: Seq[MonitorWaitRequestInfo] = ???
   }
 
   describe("MonitorWaitProfile") {

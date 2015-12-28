@@ -1,19 +1,15 @@
 package org.scaladebugger.api.lowlevel.monitors
 
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.utils.PendingActionManager
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 /**
  * Provides pending monitor waited capabilities to an existing
  * monitor waited manager.
  */
-trait PendingMonitorWaitedSupport
-  extends MonitorWaitedManager
-  with PendingRequestSupport
-{
+trait PendingMonitorWaitedSupport extends PendingMonitorWaitedSupportLike {
   /**
    * Represents the manager used to store pending monitor waited requests and
    * process them later.
@@ -25,7 +21,7 @@ trait PendingMonitorWaitedSupport
    *
    * @return The collection of successfully-processed monitor waited requests
    */
-  def processAllPendingMonitorWaitedRequests(): Seq[MonitorWaitedRequestInfo] = {
+  override def processAllPendingMonitorWaitedRequests(): Seq[MonitorWaitedRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -34,7 +30,7 @@ trait PendingMonitorWaitedSupport
    *
    * @return The collection of monitor waited requests
    */
-  def pendingMonitorWaitedRequests: Seq[MonitorWaitedRequestInfo] = {
+  override def pendingMonitorWaitedRequests: Seq[MonitorWaitedRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 

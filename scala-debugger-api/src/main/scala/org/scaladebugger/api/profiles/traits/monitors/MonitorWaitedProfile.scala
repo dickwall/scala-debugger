@@ -3,6 +3,7 @@ package org.scaladebugger.api.profiles.traits.monitors
 import com.sun.jdi.event.MonitorWaitedEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.monitors.MonitorWaitedRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
@@ -16,6 +17,13 @@ trait MonitorWaitedProfile {
   /** Represents a monitor waited event and any associated data. */
   type MonitorWaitedEventAndData =
     (MonitorWaitedEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending monitor waited requests.
+   *
+   * @return The collection of information on monitor waited requests
+   */
+  def monitorWaitedRequests: Seq[MonitorWaitedRequestInfo]
 
   /**
    * Constructs a stream of monitor waited events.

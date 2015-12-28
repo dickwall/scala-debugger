@@ -5,18 +5,18 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.sun.jdi.event.MethodEntryEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.events.EventType.MethodEntryEventType
+import org.scaladebugger.api.lowlevel.events.filters.{MethodNameFilter, UniqueIdPropertyFilter}
 import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
-import org.scaladebugger.api.lowlevel.events.filters.{UniqueIdPropertyFilter, MethodNameFilter}
-import org.scaladebugger.api.lowlevel.methods.{MethodEntryManager, StandardMethodEntryManager}
+import org.scaladebugger.api.lowlevel.methods._
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
-import org.scaladebugger.api.profiles.traits.methods.MethodEntryProfile
-import org.scaladebugger.api.utils.{MultiMap, Memoization}
-import org.scaladebugger.api.lowlevel.events.EventType.MethodEntryEventType
 import org.scaladebugger.api.profiles.Constants._
+import org.scaladebugger.api.profiles.traits.methods.MethodEntryProfile
+import org.scaladebugger.api.utils.{Memoization, MultiMap}
 
 import scala.collection.JavaConverters._
 import scala.util.Try
@@ -42,6 +42,18 @@ trait PureMethodEntryProfile extends MethodEntryProfile {
     (String, String, Seq[JDIArgument]),
     AtomicInteger
   ]().asScala
+
+  /**
+   * Retrieves the collection of active and pending method entry requests.
+   *
+   * @return The collection of information on method entry requests
+   */
+  override def methodEntryRequests: Seq[MethodEntryRequestInfo] = {
+    methodEntryManager.methodEntryRequestList ++ (methodEntryManager match {
+      case p: PendingMethodEntrySupportLike => p.pendingMethodEntryRequests
+      case _                                => Nil
+    })
+  }
 
   /**
    * Constructs a stream of method entry events for the specified class and

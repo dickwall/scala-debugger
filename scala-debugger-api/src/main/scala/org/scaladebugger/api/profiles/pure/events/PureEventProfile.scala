@@ -1,7 +1,7 @@
 package org.scaladebugger.api.profiles.pure.events
 
 import org.scaladebugger.api.lowlevel.JDIArgument
-import org.scaladebugger.api.lowlevel.events.EventManager
+import org.scaladebugger.api.lowlevel.events.{PendingEventHandlerSupportLike, EventHandlerInfo, EventManager}
 import org.scaladebugger.api.lowlevel.events.EventType.EventType
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
 import org.scaladebugger.api.pipelines.Pipeline
@@ -32,5 +32,17 @@ trait PureEventProfile extends EventProfile {
   ): Try[IdentityPipeline[EventAndData]] = Try {
     val JDIArgumentGroup(_, eArgs, _) = JDIArgumentGroup(extraArguments: _*)
     eventManager.addEventDataStream(eventType, eArgs: _*)
+  }
+
+  /**
+   * Retrieves the collection of active event handlers.
+   *
+   * @return The collection of information on event handlers
+   */
+  override def eventHandlers: Seq[EventHandlerInfo] = {
+    eventManager.getAllEventHandlerInfo ++ (eventManager match {
+      case p: PendingEventHandlerSupportLike  => p.pendingEventHandlers
+      case _                                  => Nil
+    })
   }
 }

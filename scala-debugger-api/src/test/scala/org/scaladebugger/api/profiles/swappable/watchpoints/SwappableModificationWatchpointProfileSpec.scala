@@ -18,6 +18,25 @@ class SwappableModificationWatchpointProfileSpec extends FunSpec with Matchers
   }
 
   describe("SwappableModificationWatchpointProfile") {
+    describe("#modificationWatchpointRequests") {
+      it("should invoke the method on the underlying profile") {
+        (mockProfileManager.retrieve _).expects(*)
+          .returning(Some(mockDebugProfile)).once()
+
+        (mockDebugProfile.modificationWatchpointRequests _).expects().once()
+
+        swappableDebugProfile.modificationWatchpointRequests
+      }
+
+      it("should throw an exception if there is no underlying profile") {
+        (mockProfileManager.retrieve _).expects(*).returning(None).once()
+
+        intercept[AssertionError] {
+          swappableDebugProfile.modificationWatchpointRequests
+        }
+      }
+    }
+
     describe("#onModificationWatchpointWithData") {
       it("should invoke the method on the underlying profile") {
         val className = "some class"

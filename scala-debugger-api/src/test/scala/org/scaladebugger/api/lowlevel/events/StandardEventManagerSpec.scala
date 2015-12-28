@@ -1,17 +1,17 @@
 package org.scaladebugger.api.lowlevel.events
 
-import com.sun.jdi.event.{Event, EventSet, EventQueue}
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{ParallelTestExecution, Matchers, FunSpec}
-
-import EventType._
+import com.sun.jdi.event.{Event, EventQueue, EventSet}
+import org.scaladebugger.api.lowlevel.events.EventType._
 import org.scaladebugger.api.lowlevel.events.data.{JDIEventDataProcessor, JDIEventDataRequest, JDIEventDataResult}
-import org.scaladebugger.api.lowlevel.events.filters.{JDIEventFilterProcessor, JDIEventFilter}
+import org.scaladebugger.api.lowlevel.events.filters.{JDIEventFilter, JDIEventFilterProcessor}
 import org.scaladebugger.api.utils.LoopingTaskRunner
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 
 class StandardEventManagerSpec extends FunSpec with Matchers with MockFactory
   with ParallelTestExecution with org.scalamock.matchers.Matchers
 {
+  private val TestHandlerId = java.util.UUID.randomUUID().toString
   private val mockEventQueue = mock[EventQueue]
   private val mockLoopingTaskRunner = mock[LoopingTaskRunner]
 
@@ -361,6 +361,36 @@ class StandardEventManagerSpec extends FunSpec with Matchers with MockFactory
         //       it against the original handler without messing with the
         //       wrapping function.
         eventManager.getEventHandler(eventHandlerId) should not be (None)
+      }
+    }
+
+    describe("#getAllEventHandlerInfo") {
+      it("should return an empty collection if no handlers are found") {
+        val expected = Nil
+
+        val actual = eventManager.getAllEventHandlerInfo
+
+        actual should be (expected)
+      }
+
+      it("should return a collection of handler info for all available handlers") {
+        val expected = EventHandlerInfo(
+          TestHandlerId,
+          stub[EventType],
+          stub[EventManager#EventHandler]
+        )
+
+        eventManager.addEventHandlerFromInfo(expected)
+
+        val eventHandlerInfoList = eventManager.getAllEventHandlerInfo
+        val actual = eventHandlerInfoList.head
+
+        // NOTE: The event handler is wrapped, so we cannot use a simple
+        //       direct comparison
+        eventHandlerInfoList should have length (1)
+        actual.eventHandlerId should be (expected.eventHandlerId)
+        actual.eventType should be (expected.eventType)
+        actual.extraArguments should be (expected.extraArguments)
       }
     }
 

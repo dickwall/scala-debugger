@@ -5,18 +5,18 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.sun.jdi.event.ClassUnloadEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
-import org.scaladebugger.api.lowlevel.classes.{ClassUnloadManager, StandardClassUnloadManager}
-import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
+import org.scaladebugger.api.lowlevel.classes._
+import org.scaladebugger.api.lowlevel.events.EventType._
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
+import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
-import org.scaladebugger.api.profiles.traits.classes.ClassUnloadProfile
-import org.scaladebugger.api.utils.{MultiMap, Memoization}
-import org.scaladebugger.api.lowlevel.events.EventType._
 import org.scaladebugger.api.profiles.Constants._
+import org.scaladebugger.api.profiles.traits.classes.ClassUnloadProfile
+import org.scaladebugger.api.utils.{Memoization, MultiMap}
 
 import scala.collection.JavaConverters._
 import scala.util.Try
@@ -42,6 +42,22 @@ trait PureClassUnloadProfile extends ClassUnloadProfile {
     Seq[JDIArgument],
     AtomicInteger
   ]().asScala
+
+  /**
+   * Retrieves the collection of active and pending class unload requests.
+   *
+   * @return The collection of information on class unload requests
+   */
+  override def classUnloadRequests: Seq[ClassUnloadRequestInfo] = {
+    val activeRequests = classUnloadManager.classUnloadRequestList.flatMap(
+      classUnloadManager.getClassUnloadRequestInfo
+    )
+
+    activeRequests ++ (classUnloadManager match {
+      case p: PendingClassUnloadSupportLike => p.pendingClassUnloadRequests
+      case _                                => Nil
+    })
+  }
 
   /**
    * Constructs a stream of class unload events.

@@ -3,15 +3,15 @@ package org.scaladebugger.api.profiles.pure.steps
 import com.sun.jdi.ThreadReference
 import com.sun.jdi.event.StepEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.events.EventType.StepEventType
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
-import org.scaladebugger.api.lowlevel.events.{JDIEventArgument, EventManager}
+import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.filters.ThreadFilter
-import org.scaladebugger.api.lowlevel.steps.{StepManager, StandardStepManager}
+import org.scaladebugger.api.lowlevel.steps._
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.traits.steps.StepProfile
-import org.scaladebugger.api.lowlevel.events.EventType.StepEventType
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -23,6 +23,18 @@ import scala.util.{Failure, Success, Try}
 trait PureStepProfile extends StepProfile {
   protected val stepManager: StepManager
   protected val eventManager: EventManager
+
+  /**
+   * Retrieves the collection of active and pending step requests.
+   *
+   * @return The collection of information on step requests
+   */
+  override def stepRequests: Seq[StepRequestInfo] = {
+    stepManager.stepRequestList ++ (stepManager match {
+      case p: PendingStepSupportLike  => p.pendingStepRequests
+      case _                          => Nil
+    })
+  }
 
   /**
    * Steps in from the current location to the next line.

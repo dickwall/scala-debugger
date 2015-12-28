@@ -4,6 +4,7 @@ import com.sun.jdi.ThreadReference
 import com.sun.jdi.event.StepEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.steps.StepRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
 import scala.concurrent.Future
@@ -18,6 +19,13 @@ import scala.util.Try
 trait StepProfile {
   /** Represents a step event and any associated data. */
   type StepEventAndData = (StepEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending step requests.
+   *
+   * @return The collection of information on step requests
+   */
+  def stepRequests: Seq[StepRequestInfo]
 
   /**
    * Steps in from the current location to the next line.

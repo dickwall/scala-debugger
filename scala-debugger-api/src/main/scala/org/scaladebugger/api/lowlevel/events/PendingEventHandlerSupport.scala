@@ -1,6 +1,5 @@
 package org.scaladebugger.api.lowlevel.events
 
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.events.EventType.EventType
 import org.scaladebugger.api.utils.PendingActionManager
 
@@ -8,10 +7,7 @@ import org.scaladebugger.api.utils.PendingActionManager
  * Provides pending event capabilities to an existing event manager. Note that
  * all newly-created event handlers will be pending while pending is enabled.
  */
-trait PendingEventHandlerSupport
-  extends EventManager
-  with PendingRequestSupport
-{
+trait PendingEventHandlerSupport extends PendingEventHandlerSupportLike {
   /**
    * Represents the manager used to store pending event handlers and
    * process them later.
@@ -23,7 +19,7 @@ trait PendingEventHandlerSupport
    *
    * @return The collection of successfully-processed event handlers
    */
-  def processAllPendingEventHandlers(): Seq[EventHandlerInfo] = {
+  override def processAllPendingEventHandlers(): Seq[EventHandlerInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -32,7 +28,7 @@ trait PendingEventHandlerSupport
    *
    * @return The collection of event request information
    */
-  def pendingEventHandlers: Seq[EventHandlerInfo] = {
+  override def pendingEventHandlers: Seq[EventHandlerInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 

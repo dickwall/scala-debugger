@@ -1,6 +1,5 @@
 package org.scaladebugger.api.lowlevel.breakpoints
 
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.utils.PendingActionManager
 
@@ -9,10 +8,7 @@ import scala.util.{Success, Try}
 /**
  * Provides pending breakpoint capabilities to an existing breakpoint manager.
  */
-trait PendingBreakpointSupport
-  extends BreakpointManager
-  with PendingRequestSupport
-{
+trait PendingBreakpointSupport extends PendingBreakpointSupportLike {
   /**
    * Represents the manager used to store pending breakpoint requests and
    * process them later.
@@ -24,7 +20,7 @@ trait PendingBreakpointSupport
    *
    * @return The collection of successfully-processed breakpoint requests
    */
-  def processAllPendingBreakpointRequests(): Seq[BreakpointRequestInfo] = {
+  override def processAllPendingBreakpointRequests(): Seq[BreakpointRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -33,7 +29,7 @@ trait PendingBreakpointSupport
    *
    * @return The collection of breakpoint request information
    */
-  def pendingBreakpointRequests: Seq[BreakpointRequestInfo] = {
+  override def pendingBreakpointRequests: Seq[BreakpointRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 
@@ -45,7 +41,7 @@ trait PendingBreakpointSupport
    *
    * @return The collection of successfully-processed breakpoint requests
    */
-  def processPendingBreakpointRequestsForFile(
+  override def processPendingBreakpointRequestsForFile(
     fileName: String
   ): Seq[BreakpointRequestInfo] = {
     pendingActionManager.processActions(_.data.fileName == fileName).map(_.data)
@@ -59,7 +55,7 @@ trait PendingBreakpointSupport
    *
    * @return The collection of breakpoint request information
    */
-  def pendingBreakpointRequestsForFile(
+  override def pendingBreakpointRequestsForFile(
     fileName: String
   ): Seq[BreakpointRequestInfo] = {
     pendingActionManager.getPendingActionData(_.data.fileName == fileName)

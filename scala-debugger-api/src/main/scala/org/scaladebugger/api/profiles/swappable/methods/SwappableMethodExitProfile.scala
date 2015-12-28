@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.methods
 
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.methods.MethodExitRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.methods.MethodExitProfile
@@ -24,5 +25,9 @@ trait SwappableMethodExitProfile extends MethodExitProfile {
       methodName,
       extraArguments: _*
     )
+  }
+
+  override def methodExitRequests: Seq[MethodExitRequestInfo] = {
+    withCurrentProfile.methodExitRequests
   }
 }

@@ -2,6 +2,7 @@ package org.scaladebugger.api.profiles.traits.steps
 
 import com.sun.jdi.ThreadReference
 import com.sun.jdi.event.StepEvent
+import org.scaladebugger.api.lowlevel.steps.StepRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
@@ -62,6 +63,8 @@ class StepProfileSpec extends FunSpec with Matchers with ParallelTestExecution
     ): Try[IdentityPipeline[StepEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def stepRequests: Seq[StepRequestInfo] = ???
   }
 
   private val failStepProfile = new Object with StepProfile {
@@ -101,6 +104,8 @@ class StepProfileSpec extends FunSpec with Matchers with ParallelTestExecution
     ): Try[IdentityPipeline[StepEventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def stepRequests: Seq[StepRequestInfo] = ???
   }
 
   describe("StepProfile") {
@@ -152,6 +157,8 @@ class StepProfileSpec extends FunSpec with Matchers with ParallelTestExecution
             threadReference: ThreadReference,
             extraArguments: JDIArgument*
           ): Try[IdentityPipeline[(StepEvent, Seq[JDIEventDataResult])]] = ???
+
+          override def stepRequests: Seq[StepRequestInfo] = ???
         }
 
         val actual = stepProfile.stepIntoLine(mockThreadReference)
@@ -214,6 +221,8 @@ class StepProfileSpec extends FunSpec with Matchers with ParallelTestExecution
             threadReference: ThreadReference,
             extraArguments: JDIArgument*
           ): Try[IdentityPipeline[(StepEvent, Seq[JDIEventDataResult])]] = ???
+
+          override def stepRequests: Seq[StepRequestInfo] = ???
         }
 
         val actual = stepProfile.stepOverLine(mockThreadReference)
@@ -276,6 +285,8 @@ class StepProfileSpec extends FunSpec with Matchers with ParallelTestExecution
             threadReference: ThreadReference,
             extraArguments: JDIArgument*
           ): Try[IdentityPipeline[(StepEvent, Seq[JDIEventDataResult])]] = ???
+
+          override def stepRequests: Seq[StepRequestInfo] = ???
         }
 
         val actual = stepProfile.stepOutLine(mockThreadReference)
@@ -338,6 +349,8 @@ class StepProfileSpec extends FunSpec with Matchers with ParallelTestExecution
             threadReference: ThreadReference,
             extraArguments: JDIArgument*
           ): Try[IdentityPipeline[(StepEvent, Seq[JDIEventDataResult])]] = ???
+
+          override def stepRequests: Seq[StepRequestInfo] = ???
         }
 
         val actual = stepProfile.stepIntoMin(mockThreadReference)
@@ -400,6 +413,8 @@ class StepProfileSpec extends FunSpec with Matchers with ParallelTestExecution
             threadReference: ThreadReference,
             extraArguments: JDIArgument*
           ): Try[IdentityPipeline[(StepEvent, Seq[JDIEventDataResult])]] = ???
+
+          override def stepRequests: Seq[StepRequestInfo] = ???
         }
 
         val actual = stepProfile.stepOverMin(mockThreadReference)
@@ -462,6 +477,8 @@ class StepProfileSpec extends FunSpec with Matchers with ParallelTestExecution
             threadReference: ThreadReference,
             extraArguments: JDIArgument*
           ): Try[IdentityPipeline[(StepEvent, Seq[JDIEventDataResult])]] = ???
+
+          override def stepRequests: Seq[StepRequestInfo] = ???
         }
 
         val actual = stepProfile.stepOutMin(mockThreadReference)

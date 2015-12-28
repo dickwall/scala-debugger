@@ -5,18 +5,18 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.sun.jdi.event.MonitorWaitedEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
-import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
+import org.scaladebugger.api.lowlevel.events.EventType._
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
-import org.scaladebugger.api.lowlevel.monitors.{MonitorWaitedManager, StandardMonitorWaitedManager}
+import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
+import org.scaladebugger.api.lowlevel.monitors._
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
-import org.scaladebugger.api.profiles.traits.monitors.MonitorWaitedProfile
-import org.scaladebugger.api.utils.{MultiMap, Memoization}
-import org.scaladebugger.api.lowlevel.events.EventType._
 import org.scaladebugger.api.profiles.Constants._
+import org.scaladebugger.api.profiles.traits.monitors.MonitorWaitedProfile
+import org.scaladebugger.api.utils.{Memoization, MultiMap}
 
 import scala.collection.JavaConverters._
 import scala.util.Try
@@ -42,6 +42,22 @@ trait PureMonitorWaitedProfile extends MonitorWaitedProfile {
     Seq[JDIArgument],
     AtomicInteger
   ]().asScala
+
+  /**
+   * Retrieves the collection of active and pending monitor waited requests.
+   *
+   * @return The collection of information on monitor waited requests
+   */
+  override def monitorWaitedRequests: Seq[MonitorWaitedRequestInfo] = {
+    val activeRequests = monitorWaitedManager.monitorWaitedRequestList.flatMap(
+      monitorWaitedManager.getMonitorWaitedRequestInfo
+    )
+
+    activeRequests ++ (monitorWaitedManager match {
+      case p: PendingMonitorWaitedSupportLike => p.pendingMonitorWaitedRequests
+      case _                                  => Nil
+    })
+  }
 
   /**
    * Constructs a stream of monitor waited events.

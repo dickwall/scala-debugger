@@ -18,6 +18,24 @@ class SwappableExceptionProfileSpec extends FunSpec with Matchers
   }
 
   describe("SwappableExceptionProfile") {
+    describe("#exceptionRequests") {
+      it("should invoke the method on the underlying profile") {
+        (mockProfileManager.retrieve _).expects(*)
+          .returning(Some(mockDebugProfile)).once()
+
+        (mockDebugProfile.exceptionRequests _).expects().once()
+
+        swappableDebugProfile.exceptionRequests
+      }
+
+      it("should throw an exception if there is no underlying profile") {
+        (mockProfileManager.retrieve _).expects(*).returning(None).once()
+
+        intercept[AssertionError] {
+          swappableDebugProfile.exceptionRequests
+        }
+      }
+    }
     describe("#onExceptionWithData") {
       it("should invoke the method on the underlying profile") {
         val exceptionName = "some exception"

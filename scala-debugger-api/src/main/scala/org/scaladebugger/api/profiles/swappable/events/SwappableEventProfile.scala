@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.events
 
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.events.EventHandlerInfo
 import org.scaladebugger.api.lowlevel.events.EventType.EventType
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
@@ -20,5 +21,9 @@ trait SwappableEventProfile extends EventProfile {
     extraArguments: JDIArgument*
   ): Try[IdentityPipeline[EventAndData]] = {
     withCurrentProfile.onEventWithData(eventType, extraArguments: _*)
+  }
+
+  override def eventHandlers: Seq[EventHandlerInfo] = {
+    withCurrentProfile.eventHandlers
   }
 }

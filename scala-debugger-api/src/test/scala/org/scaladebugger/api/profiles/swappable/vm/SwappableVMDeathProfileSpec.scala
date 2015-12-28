@@ -18,6 +18,25 @@ class SwappableVMDeathProfileSpec extends FunSpec with Matchers
   }
 
   describe("SwappableVMDeathProfile") {
+    describe("#vmDeathRequests") {
+      it("should invoke the method on the underlying profile") {
+        (mockProfileManager.retrieve _).expects(*)
+          .returning(Some(mockDebugProfile)).once()
+
+        (mockDebugProfile.vmDeathRequests _).expects().once()
+
+        swappableDebugProfile.vmDeathRequests
+      }
+
+      it("should throw an exception if there is no underlying profile") {
+        (mockProfileManager.retrieve _).expects(*).returning(None).once()
+
+        intercept[AssertionError] {
+          swappableDebugProfile.vmDeathRequests
+        }
+      }
+    }
+
     describe("#onVMDeathWithData") {
       it("should invoke the method on the underlying profile") {
         val arguments = Seq(mock[JDIArgument])

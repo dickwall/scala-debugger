@@ -18,6 +18,25 @@ class SwappableMonitorWaitProfileSpec extends FunSpec with Matchers
   }
 
   describe("SwappableMonitorWaitProfile") {
+    describe("#monitorWaitRequests") {
+      it("should invoke the method on the underlying profile") {
+        (mockProfileManager.retrieve _).expects(*)
+          .returning(Some(mockDebugProfile)).once()
+
+        (mockDebugProfile.monitorWaitRequests _).expects().once()
+
+        swappableDebugProfile.monitorWaitRequests
+      }
+
+      it("should throw an exception if there is no underlying profile") {
+        (mockProfileManager.retrieve _).expects(*).returning(None).once()
+
+        intercept[AssertionError] {
+          swappableDebugProfile.monitorWaitRequests
+        }
+      }
+    }
+
     describe("#onMonitorWaitWithData") {
       it("should invoke the method on the underlying profile") {
         val arguments = Seq(mock[JDIArgument])

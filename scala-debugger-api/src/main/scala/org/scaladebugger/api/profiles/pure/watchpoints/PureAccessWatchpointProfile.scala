@@ -5,18 +5,18 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.sun.jdi.event.AccessWatchpointEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.events.EventType.AccessWatchpointEventType
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
-import org.scaladebugger.api.lowlevel.events.{JDIEventArgument, EventManager}
+import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
-import org.scaladebugger.api.lowlevel.watchpoints.{AccessWatchpointManager, NoFieldFound, StandardAccessWatchpointManager}
+import org.scaladebugger.api.lowlevel.watchpoints._
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
-import org.scaladebugger.api.profiles.traits.watchpoints.AccessWatchpointProfile
-import org.scaladebugger.api.utils.{MultiMap, Memoization}
-import org.scaladebugger.api.lowlevel.events.EventType.AccessWatchpointEventType
 import org.scaladebugger.api.profiles.Constants._
+import org.scaladebugger.api.profiles.traits.watchpoints.AccessWatchpointProfile
+import org.scaladebugger.api.utils.{Memoization, MultiMap}
 
 import scala.collection.JavaConverters._
 import scala.util.Try
@@ -28,6 +28,18 @@ import scala.util.Try
 trait PureAccessWatchpointProfile extends AccessWatchpointProfile {
   protected val accessWatchpointManager: AccessWatchpointManager
   protected val eventManager: EventManager
+
+  /**
+   * Retrieves the collection of active and pending access watchpoint requests.
+   *
+   * @return The collection of information on access watchpoint requests
+   */
+  override def accessWatchpointRequests: Seq[AccessWatchpointRequestInfo] = {
+    accessWatchpointManager.accessWatchpointRequestList ++ (accessWatchpointManager match {
+      case p: PendingAccessWatchpointSupportLike  => p.pendingAccessWatchpointRequests
+      case _                                      => Nil
+    })
+  }
 
   /**
    * Contains a mapping of request ids to associated event handler ids.

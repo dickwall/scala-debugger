@@ -1,7 +1,6 @@
 package org.scaladebugger.api.lowlevel.steps
 
 import com.sun.jdi.ThreadReference
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.utils.PendingActionManager
 
@@ -11,10 +10,7 @@ import scala.util.{Success, Try}
  * Provides pending step capabilities to an existing access
  * watchpoint manager.
  */
-trait PendingStepSupport
-  extends StepManager
-  with PendingRequestSupport
-{
+trait PendingStepSupport extends PendingStepSupportLike {
   /**
    * Represents the manager used to store pending step requests
    * and process them later.
@@ -26,7 +22,7 @@ trait PendingStepSupport
    *
    * @return The collection of successfully-processed step requests
    */
-  def processAllPendingStepRequests(): Seq[StepRequestInfo] = {
+  override def processAllPendingStepRequests(): Seq[StepRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -35,7 +31,7 @@ trait PendingStepSupport
    *
    * @return The collection of step request information
    */
-  def pendingStepRequests: Seq[StepRequestInfo] = {
+  override def pendingStepRequests: Seq[StepRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 
@@ -46,7 +42,7 @@ trait PendingStepSupport
    *
    * @return The collection of successfully-processed step requests
    */
-  def processPendingStepRequestsForThread(
+  override def processPendingStepRequestsForThread(
     threadReference: ThreadReference
   ): Seq[StepRequestInfo] = {
     pendingActionManager.processActions(
@@ -61,7 +57,7 @@ trait PendingStepSupport
    *
    * @return The collection of successfully-processed step requests
    */
-  def pendingStepRequestsForThread(
+  override def pendingStepRequestsForThread(
     threadReference: ThreadReference
   ): Seq[StepRequestInfo] = {
     pendingActionManager.getPendingActionData(

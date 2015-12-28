@@ -1,7 +1,7 @@
 package org.scaladebugger.api.profiles.pure.breakpoints
 
 import com.sun.jdi.event.Event
-import org.scaladebugger.api.lowlevel.breakpoints.BreakpointManager
+import org.scaladebugger.api.lowlevel.breakpoints.{BreakpointManager, BreakpointRequestInfo, PendingBreakpointSupportLike}
 import org.scaladebugger.api.lowlevel.classes.ClassManager
 import org.scaladebugger.api.lowlevel.events.EventManager
 import org.scaladebugger.api.lowlevel.events.EventType.BreakpointEventType
@@ -39,6 +39,65 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
   }
 
   describe("PureBreakpointProfile") {
+    describe("#breakpointRequests") {
+      it("should include all active requests") {
+        val expected = Seq(
+          BreakpointRequestInfo(TestRequestId, "some file", 999)
+        )
+
+        val mockBreakpointManager = mock[PendingBreakpointSupportLike]
+        val pureBreakpointProfile = new Object with PureBreakpointProfile {
+          override protected val breakpointManager = mockBreakpointManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockBreakpointManager.breakpointRequestList _).expects()
+          .returning(expected).once()
+
+        (mockBreakpointManager.pendingBreakpointRequests _).expects()
+          .returning(Nil).once()
+
+        val actual = pureBreakpointProfile.breakpointRequests
+
+        actual should be (expected)
+      }
+
+      it("should include pending requests if supported") {
+        val expected = Seq(
+          BreakpointRequestInfo(TestRequestId, "some file", 999)
+        )
+
+        val mockBreakpointManager = mock[PendingBreakpointSupportLike]
+        val pureBreakpointProfile = new Object with PureBreakpointProfile {
+          override protected val breakpointManager = mockBreakpointManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockBreakpointManager.breakpointRequestList _).expects()
+          .returning(Nil).once()
+
+        (mockBreakpointManager.pendingBreakpointRequests _).expects()
+          .returning(expected).once()
+
+        val actual = pureBreakpointProfile.breakpointRequests
+
+        actual should be (expected)
+      }
+
+      it("should only include active requests if pending unsupported") {
+        val expected = Seq(
+          BreakpointRequestInfo(TestRequestId, "some file", 999)
+        )
+
+        (mockBreakpointManager.breakpointRequestList _).expects()
+          .returning(expected).once()
+
+        val actual = pureBreakpointProfile.breakpointRequests
+
+        actual should be (expected)
+      }
+    }
+
     describe("#onBreakpointWithData") {
       it("should create a new request if one has not be made yet") {
         val fileName = "some file"

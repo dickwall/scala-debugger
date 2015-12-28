@@ -8,7 +8,7 @@ import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.EventType._
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
 import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
-import org.scaladebugger.api.lowlevel.monitors.MonitorContendedEnteredManager
+import org.scaladebugger.api.lowlevel.monitors.{PendingMonitorContendedEnteredSupportLike, PendingMonitorContendedEnteredSupport, MonitorContendedEnteredRequestInfo, MonitorContendedEnteredManager}
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
@@ -42,6 +42,23 @@ trait PureMonitorContendedEnteredProfile extends MonitorContendedEnteredProfile 
     Seq[JDIArgument],
     AtomicInteger
   ]().asScala
+
+  /**
+   * Retrieves the collection of active and pending monitor contended entered
+   * requests.
+   *
+   * @return The collection of information on monitor contended entered requests
+   */
+  override def monitorContendedEnteredRequests: Seq[MonitorContendedEnteredRequestInfo] = {
+    val activeRequests = monitorContendedEnteredManager.monitorContendedEnteredRequestList.flatMap(
+      monitorContendedEnteredManager.getMonitorContendedEnteredRequestInfo
+    )
+
+    activeRequests ++ (monitorContendedEnteredManager match {
+      case p: PendingMonitorContendedEnteredSupportLike => p.pendingMonitorContendedEnteredRequests
+      case _                                            => Nil
+    })
+  }
 
   /**
    * Constructs a stream of monitor contended entered events.

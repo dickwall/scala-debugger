@@ -393,6 +393,13 @@ trait EventManager {
   def getEventHandler(eventHandlerId: String): Option[EventHandler]
 
   /**
+   * Retrieves information on all event handlers.
+   *
+   * @return The collection of information on all event handlers
+   */
+  def getAllEventHandlerInfo: Seq[EventHandlerInfo]
+
+  /**
    * Removes the event function from this manager.
    *
    * @param eventHandlerId The id of the event handler to remove

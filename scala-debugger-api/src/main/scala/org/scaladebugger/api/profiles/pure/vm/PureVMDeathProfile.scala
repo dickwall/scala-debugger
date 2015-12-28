@@ -10,7 +10,7 @@ import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
-import org.scaladebugger.api.lowlevel.vm.{VMDeathManager, StandardVMDeathManager}
+import org.scaladebugger.api.lowlevel.vm._
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.traits.vm.VMDeathProfile
@@ -41,6 +41,22 @@ trait PureVMDeathProfile extends VMDeathProfile {
     Seq[JDIArgument],
     AtomicInteger
   ]().asScala
+
+  /**
+   * Retrieves the collection of active and pending vm death requests.
+   *
+   * @return The collection of information on vm death requests
+   */
+  override def vmDeathRequests: Seq[VMDeathRequestInfo] = {
+    val activeRequests = vmDeathManager.vmDeathRequestList.flatMap(
+      vmDeathManager.getVMDeathRequestInfo
+    )
+
+    activeRequests ++ (vmDeathManager match {
+      case p: PendingVMDeathSupportLike => p.pendingVMDeathRequests
+      case _                            => Nil
+    })
+  }
 
   /**
    * Constructs a stream of vm death events.

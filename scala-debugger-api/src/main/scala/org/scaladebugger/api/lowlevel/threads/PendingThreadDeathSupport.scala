@@ -1,19 +1,15 @@
 package org.scaladebugger.api.lowlevel.threads
 
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.utils.PendingActionManager
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 /**
  * Provides pending thread death capabilities to an existing
  * thread death manager.
  */
-trait PendingThreadDeathSupport
-  extends ThreadDeathManager
-  with PendingRequestSupport
-{
+trait PendingThreadDeathSupport extends PendingThreadDeathSupportLike {
   /**
    * Represents the manager used to store pending thread death requests and
    * process them later.
@@ -25,7 +21,7 @@ trait PendingThreadDeathSupport
    *
    * @return The collection of successfully-processed thread death requests
    */
-  def processAllPendingThreadDeathRequests(): Seq[ThreadDeathRequestInfo] = {
+  override def processAllPendingThreadDeathRequests(): Seq[ThreadDeathRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -34,7 +30,7 @@ trait PendingThreadDeathSupport
    *
    * @return The collection of thread death requests
    */
-  def pendingThreadDeathRequests: Seq[ThreadDeathRequestInfo] = {
+  override def pendingThreadDeathRequests: Seq[ThreadDeathRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 

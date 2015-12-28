@@ -3,6 +3,7 @@ package org.scaladebugger.api.profiles.traits.monitors
 import com.sun.jdi.event.MonitorContendedEnteredEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.monitors.MonitorContendedEnteredRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
@@ -16,6 +17,14 @@ trait MonitorContendedEnteredProfile {
   /** Represents a monitor contended entered event and any associated data. */
   type MonitorContendedEnteredEventAndData =
     (MonitorContendedEnteredEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending monitor contended entered
+   * requests.
+   *
+   * @return The collection of information on monitor contended entered requests
+   */
+  def monitorContendedEnteredRequests: Seq[MonitorContendedEnteredRequestInfo]
 
   /**
    * Constructs a stream of monitor contended entered events.

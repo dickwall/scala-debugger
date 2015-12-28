@@ -56,6 +56,16 @@ class DummyEventManagerSpec extends FunSpec with Matchers
       }
     }
 
+    describe("#getAllEventHandlerInfo") {
+      it("should return an empty list") {
+        val expected = Nil
+
+        val actual = eventManager.getAllEventHandlerInfo
+
+        actual should be (expected)
+      }
+    }
+
     describe("#removeEventHandler") {
       it("should return None") {
         val expected = None

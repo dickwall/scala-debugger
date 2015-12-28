@@ -1,11 +1,6 @@
 package org.scaladebugger.api.profiles.pure.watchpoints
 
-import com.sun.jdi.VirtualMachine
-import com.sun.jdi.event.{Event, EventQueue}
-import com.sun.jdi.request.EventRequestManager
-import org.scaladebugger.api.profiles.Constants
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
+import com.sun.jdi.event.Event
 import org.scaladebugger.api.lowlevel.classes.ClassManager
 import org.scaladebugger.api.lowlevel.events.EventManager
 import org.scaladebugger.api.lowlevel.events.EventType.ModificationWatchpointEventType
@@ -13,9 +8,11 @@ import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
-import org.scaladebugger.api.lowlevel.watchpoints.{ModificationWatchpointManager, StandardModificationWatchpointManager}
+import org.scaladebugger.api.lowlevel.watchpoints.{ModificationWatchpointManager, ModificationWatchpointRequestInfo, PendingModificationWatchpointSupportLike}
 import org.scaladebugger.api.pipelines.Pipeline
-import org.scaladebugger.api.utils.LoopingTaskRunner
+import org.scaladebugger.api.profiles.Constants
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import test.JDIMockHelpers
 
 import scala.util.{Failure, Success}
@@ -42,6 +39,77 @@ class PureModificationWatchpointProfileSpec extends FunSpec with Matchers
   }
 
   describe("PureModificationWatchpointProfile") {
+    describe("#modificationWatchpointRequests") {
+      it("should include all active requests") {
+        val expected = Seq(
+          ModificationWatchpointRequestInfo(
+            TestRequestId,
+            "some.class.name",
+            "someFieldName"
+          )
+        )
+
+        val mockModificationWatchpointManager = mock[PendingModificationWatchpointSupportLike]
+        val pureModificationWatchpointProfile = new Object with PureModificationWatchpointProfile {
+          override protected val modificationWatchpointManager = mockModificationWatchpointManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockModificationWatchpointManager.modificationWatchpointRequestList _).expects()
+          .returning(expected).once()
+
+        (mockModificationWatchpointManager.pendingModificationWatchpointRequests _).expects()
+          .returning(Nil).once()
+
+        val actual = pureModificationWatchpointProfile.modificationWatchpointRequests
+
+        actual should be (expected)
+      }
+
+      it("should include pending requests if supported") {
+        val expected = Seq(
+          ModificationWatchpointRequestInfo(
+            TestRequestId,
+            "some.class.name",
+            "someFieldName"
+          )
+        )
+
+        val mockModificationWatchpointManager = mock[PendingModificationWatchpointSupportLike]
+        val pureModificationWatchpointProfile = new Object with PureModificationWatchpointProfile {
+          override protected val modificationWatchpointManager = mockModificationWatchpointManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockModificationWatchpointManager.modificationWatchpointRequestList _).expects()
+          .returning(Nil).once()
+
+        (mockModificationWatchpointManager.pendingModificationWatchpointRequests _).expects()
+          .returning(expected).once()
+
+        val actual = pureModificationWatchpointProfile.modificationWatchpointRequests
+
+        actual should be (expected)
+      }
+
+      it("should only include active requests if pending unsupported") {
+        val expected = Seq(
+          ModificationWatchpointRequestInfo(
+            TestRequestId,
+            "some.class.name",
+            "someFieldName"
+          )
+        )
+
+        (mockModificationWatchpointManager.modificationWatchpointRequestList _).expects()
+          .returning(expected).once()
+
+        val actual = pureModificationWatchpointProfile.modificationWatchpointRequests
+
+        actual should be (expected)
+      }
+    }
+
     describe("#onModificationWatchpointWithData") {
       it("should create a new request if one has not be made yet") {
         val className = "full.class.name"

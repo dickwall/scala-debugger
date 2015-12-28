@@ -1,6 +1,5 @@
 package org.scaladebugger.api.lowlevel.methods
 
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.utils.PendingActionManager
 
@@ -10,10 +9,7 @@ import scala.util.{Success, Try}
  * Provides pending method entry capabilities to an existing access
  * watchpoint manager.
  */
-trait PendingMethodEntrySupport
-  extends MethodEntryManager
-  with PendingRequestSupport
-{
+trait PendingMethodEntrySupport extends PendingMethodEntrySupportLike {
   /**
    * Represents the manager used to store pending method entry requests
    * and process them later.
@@ -25,7 +21,7 @@ trait PendingMethodEntrySupport
    *
    * @return The collection of successfully-processed method entry requests
    */
-  def processAllPendingMethodEntryRequests(): Seq[MethodEntryRequestInfo] = {
+  override def processAllPendingMethodEntryRequests(): Seq[MethodEntryRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -34,7 +30,7 @@ trait PendingMethodEntrySupport
    *
    * @return The collection of method entry request information
    */
-  def pendingMethodEntryRequests: Seq[MethodEntryRequestInfo] = {
+  override def pendingMethodEntryRequests: Seq[MethodEntryRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 
@@ -46,7 +42,7 @@ trait PendingMethodEntrySupport
    *
    * @return The collection of successfully-processed method entry requests
    */
-  def processPendingMethodEntryRequestsForClass(
+  override def processPendingMethodEntryRequestsForClass(
     className: String
   ): Seq[MethodEntryRequestInfo] = {
     pendingActionManager.processActions(_.data.className == className)
@@ -62,7 +58,7 @@ trait PendingMethodEntrySupport
    *
    * @return The collection of successfully-processed method entry requests
    */
-  def pendingMethodEntryRequestsForClass(
+  override def pendingMethodEntryRequestsForClass(
     className: String
   ): Seq[MethodEntryRequestInfo] = {
     pendingActionManager.getPendingActionData(_.data.className == className)

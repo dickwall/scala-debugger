@@ -1,11 +1,7 @@
 package org.scaladebugger.api.profiles.pure.classes
 
-import com.sun.jdi.event.{Event, EventQueue}
-import com.sun.jdi.request.EventRequestManager
-import org.scaladebugger.api.profiles.Constants
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
-import org.scaladebugger.api.lowlevel.classes.{ClassPrepareManager, ClassPrepareRequestInfo, StandardClassPrepareManager}
+import com.sun.jdi.event.Event
+import org.scaladebugger.api.lowlevel.classes.{ClassPrepareManager, ClassPrepareRequestInfo, PendingClassPrepareSupportLike}
 import org.scaladebugger.api.lowlevel.events.EventManager
 import org.scaladebugger.api.lowlevel.events.EventType.ClassPrepareEventType
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
@@ -13,7 +9,9 @@ import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.pipelines.Pipeline
-import org.scaladebugger.api.utils.LoopingTaskRunner
+import org.scaladebugger.api.profiles.Constants
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import test.JDIMockHelpers
 
 import scala.util.{Failure, Success}
@@ -39,6 +37,69 @@ with ParallelTestExecution with MockFactory with JDIMockHelpers
   }
 
   describe("PureClassPrepareProfile") {
+    describe("#classPrepareRequests") {
+      it("should include all active requests") {
+        val expected = Seq(
+          ClassPrepareRequestInfo(TestRequestId)
+        )
+
+        val mockClassPrepareManager = mock[PendingClassPrepareSupportLike]
+        val pureClassPrepareProfile = new Object with PureClassPrepareProfile {
+          override protected val classPrepareManager = mockClassPrepareManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockClassPrepareManager.classPrepareRequestList _).expects()
+          .returning(expected.map(_.requestId)).once()
+        (mockClassPrepareManager.getClassPrepareRequestInfo _)
+          .expects(TestRequestId).returning(expected.headOption).once()
+
+        (mockClassPrepareManager.pendingClassPrepareRequests _).expects()
+          .returning(Nil).once()
+
+        val actual = pureClassPrepareProfile.classPrepareRequests
+
+        actual should be (expected)
+      }
+
+      it("should include pending requests if supported") {
+        val expected = Seq(
+          ClassPrepareRequestInfo(TestRequestId)
+        )
+
+        val mockClassPrepareManager = mock[PendingClassPrepareSupportLike]
+        val pureClassPrepareProfile = new Object with PureClassPrepareProfile {
+          override protected val classPrepareManager = mockClassPrepareManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockClassPrepareManager.classPrepareRequestList _).expects()
+          .returning(Nil).once()
+
+        (mockClassPrepareManager.pendingClassPrepareRequests _).expects()
+          .returning(expected).once()
+
+        val actual = pureClassPrepareProfile.classPrepareRequests
+
+        actual should be (expected)
+      }
+
+      it("should only include active requests if pending unsupported") {
+        val expected = Seq(
+          ClassPrepareRequestInfo(TestRequestId)
+        )
+
+        (mockClassPrepareManager.classPrepareRequestList _).expects()
+          .returning(expected.map(_.requestId)).once()
+        (mockClassPrepareManager.getClassPrepareRequestInfo _)
+          .expects(TestRequestId).returning(expected.headOption).once()
+
+        val actual = pureClassPrepareProfile.classPrepareRequests
+
+        actual should be (expected)
+      }
+    }
+
     describe("#onClassPrepareWithData") {
       it("should create a new request if one has not be made yet") {
         val arguments = Seq(mock[JDIRequestArgument])

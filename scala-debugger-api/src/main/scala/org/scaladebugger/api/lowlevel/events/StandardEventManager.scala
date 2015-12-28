@@ -28,7 +28,7 @@ class StandardEventManager(
   private val onExceptionResume: Boolean = true
 ) extends EventManager with Logging {
   /** Contains the events, associated handlers and their ids. */
-  private val eventHandlers = new MultiMap[EventType, EventHandler]
+  private val eventHandlers = new MultiMap[EventType, EventHandlerInfo]
 
   private var eventTaskId: Option[String] = None
 
@@ -140,7 +140,16 @@ class StandardEventManager(
       newWrapperEventHandler(eventHandler, eventArguments)
 
     // Store the event handler with the filtering logic
-    eventHandlers.putWithId(eventHandlerId, eventType, wrapperEventHandler)
+    eventHandlers.putWithId(
+      eventHandlerId,
+      eventType,
+      EventHandlerInfo(
+        eventHandlerId,
+        eventType,
+        wrapperEventHandler,
+        eventArguments
+      )
+    )
 
     eventHandlerId
   }
@@ -184,7 +193,7 @@ class StandardEventManager(
   override def getHandlersForEventType(
     eventType: EventType
   ) : Seq[EventHandler] = {
-    eventHandlers.get(eventType).getOrElse(Nil)
+    eventHandlers.get(eventType).map(_.map(_.eventHandler)).getOrElse(Nil)
   }
 
   /**
@@ -207,7 +216,16 @@ class StandardEventManager(
    * @return Some event handler if found, otherwise None
    */
   override def getEventHandler(id: String): Option[EventHandler] = {
-    eventHandlers.getWithId(id)
+    eventHandlers.getWithId(id).map(_.eventHandler)
+  }
+
+  /**
+   * Retrieves information on all event handlers.
+   *
+   * @return The collection of information on all event handlers
+   */
+  override def getAllEventHandlerInfo: Seq[EventHandlerInfo] = {
+    eventHandlers.values
   }
 
   /**
@@ -218,7 +236,7 @@ class StandardEventManager(
    * @return Some event handler if removed, otherwise None
    */
   override def removeEventHandler(id: String): Option[EventHandler] = {
-    eventHandlers.removeWithId(id)
+    eventHandlers.removeWithId(id).map(_.eventHandler)
   }
 
   // ==========================================================================

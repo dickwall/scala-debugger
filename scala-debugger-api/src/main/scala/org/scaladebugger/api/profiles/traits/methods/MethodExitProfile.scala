@@ -3,6 +3,7 @@ package org.scaladebugger.api.profiles.traits.methods
 import com.sun.jdi.event.MethodExitEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.methods.MethodExitRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
@@ -15,6 +16,13 @@ import scala.util.Try
 trait MethodExitProfile {
   /** Represents a method exit event and any associated data. */
   type MethodExitEventAndData = (MethodExitEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending method exit requests.
+   *
+   * @return The collection of information on method exit requests
+   */
+  def methodExitRequests: Seq[MethodExitRequestInfo]
 
   /**
    * Constructs a stream of method exit events for the specified class and

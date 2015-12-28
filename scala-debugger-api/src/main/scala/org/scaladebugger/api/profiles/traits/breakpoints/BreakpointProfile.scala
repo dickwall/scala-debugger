@@ -2,6 +2,7 @@ package org.scaladebugger.api.profiles.traits.breakpoints
 
 import com.sun.jdi.event.BreakpointEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.breakpoints.BreakpointRequestInfo
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
@@ -15,6 +16,13 @@ import scala.util.Try
 trait BreakpointProfile {
   /** Represents a breakpoint event and any associated data. */
   type BreakpointEventAndData = (BreakpointEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending breakpoints requests.
+   *
+   * @return The collection of information on breakpoint requests
+   */
+  def breakpointRequests: Seq[BreakpointRequestInfo]
 
   /**
    * Constructs a stream of breakpoint events for the specified file and line

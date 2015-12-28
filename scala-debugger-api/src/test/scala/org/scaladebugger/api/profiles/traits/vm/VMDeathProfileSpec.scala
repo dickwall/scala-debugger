@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.vm
 
 import com.sun.jdi.event.VMDeathEvent
+import org.scaladebugger.api.lowlevel.vm.VMDeathRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -26,6 +27,8 @@ class VMDeathProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[VMDeathEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def vmDeathRequests: Seq[VMDeathRequestInfo] = ???
   }
 
   private val failVMDeathProfile = new Object with VMDeathProfile {
@@ -34,6 +37,8 @@ class VMDeathProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[VMDeathEventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def vmDeathRequests: Seq[VMDeathRequestInfo] = ???
   }
 
   describe("VMDeathProfile") {

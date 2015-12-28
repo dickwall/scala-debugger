@@ -3,7 +3,7 @@ package org.scaladebugger.api.profiles.traits.exceptions
 import com.sun.jdi.event.ExceptionEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
-import org.scaladebugger.api.pipelines.Pipeline
+import org.scaladebugger.api.lowlevel.exceptions.ExceptionRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
 import scala.util.Try
@@ -15,6 +15,13 @@ import scala.util.Try
 trait ExceptionProfile {
   /** Represents a exception event and any associated data. */
   type ExceptionEventAndData = (ExceptionEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending exception requests.
+   *
+   * @return The collection of information on exception requests
+   */
+  def exceptionRequests: Seq[ExceptionRequestInfo]
 
   /**
    * Constructs a stream of exception events for the specified exception.

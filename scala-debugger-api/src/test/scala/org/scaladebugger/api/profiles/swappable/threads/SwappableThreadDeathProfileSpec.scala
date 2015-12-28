@@ -18,6 +18,25 @@ class SwappableThreadDeathProfileSpec extends FunSpec with Matchers
   }
 
   describe("SwappableThreadDeathProfile") {
+    describe("#threadDeathRequests") {
+      it("should invoke the method on the underlying profile") {
+        (mockProfileManager.retrieve _).expects(*)
+          .returning(Some(mockDebugProfile)).once()
+
+        (mockDebugProfile.threadDeathRequests _).expects().once()
+
+        swappableDebugProfile.threadDeathRequests
+      }
+
+      it("should throw an exception if there is no underlying profile") {
+        (mockProfileManager.retrieve _).expects(*).returning(None).once()
+
+        intercept[AssertionError] {
+          swappableDebugProfile.threadDeathRequests
+        }
+      }
+    }
+
     describe("#onThreadDeathWithData") {
       it("should invoke the method on the underlying profile") {
         val arguments = Seq(mock[JDIArgument])

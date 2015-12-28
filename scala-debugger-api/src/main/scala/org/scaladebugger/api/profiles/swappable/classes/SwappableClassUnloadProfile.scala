@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.classes
 
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.classes.ClassUnloadRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.classes.ClassUnloadProfile
@@ -18,5 +19,9 @@ trait SwappableClassUnloadProfile extends ClassUnloadProfile {
     extraArguments: JDIArgument*
   ): Try[IdentityPipeline[ClassUnloadEventAndData]] = {
     withCurrentProfile.onClassUnloadWithData(extraArguments: _*)
+  }
+
+  override def classUnloadRequests: Seq[ClassUnloadRequestInfo] = {
+    withCurrentProfile.classUnloadRequests
   }
 }

@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.classes
 
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.classes.ClassPrepareRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.classes.ClassPrepareProfile
@@ -18,5 +19,9 @@ trait SwappableClassPrepareProfile extends ClassPrepareProfile {
     extraArguments: JDIArgument*
   ): Try[IdentityPipeline[ClassPrepareEventAndData]] = {
     withCurrentProfile.onClassPrepareWithData(extraArguments: _*)
+  }
+
+  override def classPrepareRequests: Seq[ClassPrepareRequestInfo] = {
+    withCurrentProfile.classPrepareRequests
   }
 }

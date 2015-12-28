@@ -1,6 +1,5 @@
 package org.scaladebugger.api.lowlevel.methods
 
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.utils.PendingActionManager
 
@@ -10,10 +9,7 @@ import scala.util.{Success, Try}
  * Provides pending method exit capabilities to an existing access
  * watchpoint manager.
  */
-trait PendingMethodExitSupport
-  extends MethodExitManager
-  with PendingRequestSupport
-{
+trait PendingMethodExitSupport extends PendingMethodExitSupportLike {
   /**
    * Represents the manager used to store pending method exit requests
    * and process them later.
@@ -25,7 +21,7 @@ trait PendingMethodExitSupport
    *
    * @return The collection of successfully-processed method exit requests
    */
-  def processAllPendingMethodExitRequests(): Seq[MethodExitRequestInfo] = {
+  override def processAllPendingMethodExitRequests(): Seq[MethodExitRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -34,7 +30,7 @@ trait PendingMethodExitSupport
    *
    * @return The collection of method exit request information
    */
-  def pendingMethodExitRequests: Seq[MethodExitRequestInfo] = {
+  override def pendingMethodExitRequests: Seq[MethodExitRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 
@@ -46,7 +42,7 @@ trait PendingMethodExitSupport
    *
    * @return The collection of successfully-processed method exit requests
    */
-  def processPendingMethodExitRequestsForClass(
+  override def processPendingMethodExitRequestsForClass(
     className: String
   ): Seq[MethodExitRequestInfo] = {
     pendingActionManager.processActions(_.data.className == className)
@@ -62,7 +58,7 @@ trait PendingMethodExitSupport
    *
    * @return The collection of successfully-processed method exit requests
    */
-  def pendingMethodExitRequestsForClass(
+  override def pendingMethodExitRequestsForClass(
     className: String
   ): Seq[MethodExitRequestInfo] = {
     pendingActionManager.getPendingActionData(_.data.className == className)

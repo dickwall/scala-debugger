@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.monitors
 
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.monitors.MonitorContendedEnteredRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.monitors.MonitorContendedEnteredProfile
@@ -18,5 +19,9 @@ trait SwappableMonitorContendedEnteredProfile extends MonitorContendedEnteredPro
     extraArguments: JDIArgument*
   ): Try[IdentityPipeline[MonitorContendedEnteredEventAndData]] = {
     withCurrentProfile.onMonitorContendedEnteredWithData(extraArguments: _*)
+  }
+
+  override def monitorContendedEnteredRequests: Seq[MonitorContendedEnteredRequestInfo] = {
+    withCurrentProfile.monitorContendedEnteredRequests
   }
 }

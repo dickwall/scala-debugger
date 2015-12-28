@@ -3,6 +3,7 @@ package org.scaladebugger.api.profiles.traits.methods
 import com.sun.jdi.event.MethodEntryEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.methods.MethodEntryRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
@@ -15,6 +16,13 @@ import scala.util.Try
 trait MethodEntryProfile {
   /** Represents a method entry event and any associated data. */
   type MethodEntryEventAndData = (MethodEntryEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending method entry requests.
+   *
+   * @return The collection of information on method entry requests
+   */
+  def methodEntryRequests: Seq[MethodEntryRequestInfo]
 
   /**
    * Constructs a stream of method entry events for the specified class and

@@ -1,20 +1,18 @@
 package org.scaladebugger.api.profiles.pure.methods
 
-import com.sun.jdi.event.{Event, EventQueue}
-import com.sun.jdi.request.EventRequestManager
-import org.scaladebugger.api.profiles.Constants
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
+import com.sun.jdi.event.Event
 import org.scaladebugger.api.lowlevel.events.EventManager
+import org.scaladebugger.api.lowlevel.events.EventType.MethodExitEventType
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
-import org.scaladebugger.api.lowlevel.events.filters.{UniqueIdPropertyFilter, MethodNameFilter}
-import org.scaladebugger.api.lowlevel.methods.{MethodExitManager, StandardMethodExitManager}
+import org.scaladebugger.api.lowlevel.events.filters.{MethodNameFilter, UniqueIdPropertyFilter}
+import org.scaladebugger.api.lowlevel.methods.{MethodExitManager, MethodExitRequestInfo, PendingMethodExitSupportLike}
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.pipelines.Pipeline
-import org.scaladebugger.api.utils.LoopingTaskRunner
+import org.scaladebugger.api.profiles.Constants
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import test.JDIMockHelpers
-import org.scaladebugger.api.lowlevel.events.EventType.MethodExitEventType
 
 import scala.util.{Failure, Success}
 
@@ -39,6 +37,77 @@ with ParallelTestExecution with MockFactory with JDIMockHelpers
   }
 
   describe("PureMethodExitProfile") {
+    describe("#methodExitRequests") {
+      it("should include all active requests") {
+        val expected = Seq(
+          MethodExitRequestInfo(
+            TestRequestId,
+            "some.class.name",
+            "someMethodName"
+          )
+        )
+
+        val mockMethodExitManager = mock[PendingMethodExitSupportLike]
+        val pureMethodExitProfile = new Object with PureMethodExitProfile {
+          override protected val methodExitManager = mockMethodExitManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockMethodExitManager.methodExitRequestList _).expects()
+          .returning(expected).once()
+
+        (mockMethodExitManager.pendingMethodExitRequests _).expects()
+          .returning(Nil).once()
+
+        val actual = pureMethodExitProfile.methodExitRequests
+
+        actual should be (expected)
+      }
+
+      it("should include pending requests if supported") {
+        val expected = Seq(
+          MethodExitRequestInfo(
+            TestRequestId,
+            "some.class.name",
+            "someMethodName"
+          )
+        )
+
+        val mockMethodExitManager = mock[PendingMethodExitSupportLike]
+        val pureMethodExitProfile = new Object with PureMethodExitProfile {
+          override protected val methodExitManager = mockMethodExitManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockMethodExitManager.methodExitRequestList _).expects()
+          .returning(Nil).once()
+
+        (mockMethodExitManager.pendingMethodExitRequests _).expects()
+          .returning(expected).once()
+
+        val actual = pureMethodExitProfile.methodExitRequests
+
+        actual should be (expected)
+      }
+
+      it("should only include active requests if pending unsupported") {
+        val expected = Seq(
+          MethodExitRequestInfo(
+            TestRequestId,
+            "some.class.name",
+            "someMethodName"
+          )
+        )
+
+        (mockMethodExitManager.methodExitRequestList _).expects()
+          .returning(expected).once()
+
+        val actual = pureMethodExitProfile.methodExitRequests
+
+        actual should be (expected)
+      }
+    }
+
     describe("#onMethodExitWithData") {
       it("should create a new request if one has not be made yet") {
         val className = "some.class.name"

@@ -3,6 +3,7 @@ package org.scaladebugger.api.profiles.traits.threads
 import com.sun.jdi.event.ThreadDeathEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.threads.ThreadDeathRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
@@ -15,6 +16,13 @@ import scala.util.Try
 trait ThreadDeathProfile {
   /** Represents a thread death event and any associated data. */
   type ThreadDeathEventAndData = (ThreadDeathEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending thread death requests.
+   *
+   * @return The collection of information on thread death requests
+   */
+  def threadDeathRequests: Seq[ThreadDeathRequestInfo]
 
   /**
    * Constructs a stream of thread death events.

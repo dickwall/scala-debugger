@@ -3,6 +3,7 @@ package org.scaladebugger.api.profiles.traits.vm
 import com.sun.jdi.event.VMDeathEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.vm.VMDeathRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
@@ -15,6 +16,13 @@ import scala.util.Try
 trait VMDeathProfile {
   /** Represents a vm death event and any associated data. */
   type VMDeathEventAndData = (VMDeathEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending vm death requests.
+   *
+   * @return The collection of information on vm death requests
+   */
+  def vmDeathRequests: Seq[VMDeathRequestInfo]
 
   /**
    * Constructs a stream of vm death events.

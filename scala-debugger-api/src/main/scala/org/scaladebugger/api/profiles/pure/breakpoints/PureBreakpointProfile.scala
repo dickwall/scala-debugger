@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.sun.jdi.event._
 import org.scaladebugger.api.lowlevel.JDIArgument
-import org.scaladebugger.api.lowlevel.breakpoints.BreakpointManager
+import org.scaladebugger.api.lowlevel.breakpoints.{BreakpointManager, BreakpointRequestInfo, PendingBreakpointSupportLike}
 import org.scaladebugger.api.lowlevel.events.EventType._
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
 import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
@@ -14,9 +14,9 @@ import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
+import org.scaladebugger.api.profiles.Constants._
 import org.scaladebugger.api.profiles.traits.breakpoints.BreakpointProfile
 import org.scaladebugger.api.utils.{Memoization, MultiMap}
-import org.scaladebugger.api.profiles.Constants._
 
 import scala.collection.JavaConverters._
 import scala.util.Try
@@ -42,6 +42,18 @@ trait PureBreakpointProfile extends BreakpointProfile {
     (String, Int, Seq[JDIEventArgument]),
     AtomicInteger
   ]().asScala
+
+  /**
+   * Retrieves the collection of active and pending breakpoint requests.
+   *
+   * @return The collection of information on breakpoint requests
+   */
+  override def breakpointRequests: Seq[BreakpointRequestInfo] = {
+    breakpointManager.breakpointRequestList ++ (breakpointManager match {
+      case p: PendingBreakpointSupportLike  => p.pendingBreakpointRequests
+      case _                                => Nil
+    })
+  }
 
   /**
    * Constructs a stream of breakpoint events for the specified file and line

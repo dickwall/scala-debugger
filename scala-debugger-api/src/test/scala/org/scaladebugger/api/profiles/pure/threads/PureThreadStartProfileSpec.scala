@@ -1,20 +1,18 @@
 package org.scaladebugger.api.profiles.pure.threads
 
-import com.sun.jdi.event.{Event, EventQueue}
-import com.sun.jdi.request.EventRequestManager
-import org.scaladebugger.api.profiles.Constants
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
+import com.sun.jdi.event.Event
 import org.scaladebugger.api.lowlevel.events.EventManager
+import org.scaladebugger.api.lowlevel.events.EventType.ThreadStartEventType
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
-import org.scaladebugger.api.lowlevel.threads.{ThreadStartManager, ThreadStartRequestInfo, StandardThreadStartManager}
+import org.scaladebugger.api.lowlevel.threads.{PendingThreadStartSupportLike, ThreadStartManager, ThreadStartRequestInfo}
 import org.scaladebugger.api.pipelines.Pipeline
-import org.scaladebugger.api.utils.LoopingTaskRunner
+import org.scaladebugger.api.profiles.Constants
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import test.JDIMockHelpers
-import org.scaladebugger.api.lowlevel.events.EventType.ThreadStartEventType
 
 import scala.util.{Failure, Success}
 
@@ -39,6 +37,69 @@ with ParallelTestExecution with MockFactory with JDIMockHelpers
   }
 
   describe("PureThreadStartProfile") {
+    describe("#threadStartRequests") {
+      it("should include all active requests") {
+        val expected = Seq(
+          ThreadStartRequestInfo(TestRequestId)
+        )
+
+        val mockThreadStartManager = mock[PendingThreadStartSupportLike]
+        val pureThreadStartProfile = new Object with PureThreadStartProfile {
+          override protected val threadStartManager = mockThreadStartManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockThreadStartManager.threadStartRequestList _).expects()
+          .returning(expected.map(_.requestId)).once()
+        (mockThreadStartManager.getThreadStartRequestInfo _)
+          .expects(TestRequestId).returning(expected.headOption).once()
+
+        (mockThreadStartManager.pendingThreadStartRequests _).expects()
+          .returning(Nil).once()
+
+        val actual = pureThreadStartProfile.threadStartRequests
+
+        actual should be (expected)
+      }
+
+      it("should include pending requests if supported") {
+        val expected = Seq(
+          ThreadStartRequestInfo(TestRequestId)
+        )
+
+        val mockThreadStartManager = mock[PendingThreadStartSupportLike]
+        val pureThreadStartProfile = new Object with PureThreadStartProfile {
+          override protected val threadStartManager = mockThreadStartManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockThreadStartManager.threadStartRequestList _).expects()
+          .returning(Nil).once()
+
+        (mockThreadStartManager.pendingThreadStartRequests _).expects()
+          .returning(expected).once()
+
+        val actual = pureThreadStartProfile.threadStartRequests
+
+        actual should be (expected)
+      }
+
+      it("should only include active requests if pending unsupported") {
+        val expected = Seq(
+          ThreadStartRequestInfo(TestRequestId)
+        )
+
+        (mockThreadStartManager.threadStartRequestList _).expects()
+          .returning(expected.map(_.requestId)).once()
+        (mockThreadStartManager.getThreadStartRequestInfo _)
+          .expects(TestRequestId).returning(expected.headOption).once()
+
+        val actual = pureThreadStartProfile.threadStartRequests
+
+        actual should be (expected)
+      }
+    }
+
     describe("#onThreadStartWithData") {
       it("should create a new request if one has not be made yet") {
         val arguments = Seq(mock[JDIRequestArgument])

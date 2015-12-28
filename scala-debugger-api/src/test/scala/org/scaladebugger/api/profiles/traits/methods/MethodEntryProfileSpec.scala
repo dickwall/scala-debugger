@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.methods
 
 import com.sun.jdi.event.MethodEntryEvent
+import org.scaladebugger.api.lowlevel.methods.MethodEntryRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -28,6 +29,8 @@ class MethodEntryProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[MethodEntryEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def methodEntryRequests: Seq[MethodEntryRequestInfo] = ???
   }
 
   private val failMethodEntryProfile = new Object with MethodEntryProfile {
@@ -38,6 +41,8 @@ class MethodEntryProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[MethodEntryEventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def methodEntryRequests: Seq[MethodEntryRequestInfo] = ???
   }
 
   describe("MethodEntryProfile") {

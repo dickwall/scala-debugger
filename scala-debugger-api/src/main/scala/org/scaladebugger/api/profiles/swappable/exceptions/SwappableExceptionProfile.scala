@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.exceptions
 
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.exceptions.ExceptionRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.exceptions.ExceptionProfile
@@ -38,5 +39,9 @@ trait SwappableExceptionProfile extends ExceptionProfile {
       notifyUncaught,
       extraArguments: _*
     )
+  }
+
+  override def exceptionRequests: Seq[ExceptionRequestInfo] = {
+    withCurrentProfile.exceptionRequests
   }
 }

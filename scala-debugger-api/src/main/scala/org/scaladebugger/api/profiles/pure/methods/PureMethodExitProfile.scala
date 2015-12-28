@@ -8,7 +8,7 @@ import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.EventType.MethodExitEventType
 import org.scaladebugger.api.lowlevel.events.filters.{MethodNameFilter, UniqueIdPropertyFilter}
 import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
-import org.scaladebugger.api.lowlevel.methods.MethodExitManager
+import org.scaladebugger.api.lowlevel.methods.{PendingMethodExitSupportLike, PendingMethodExitSupport, MethodExitRequestInfo, MethodExitManager}
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
@@ -42,6 +42,18 @@ trait PureMethodExitProfile extends MethodExitProfile {
     (String, String, Seq[JDIArgument]),
     AtomicInteger
   ]().asScala
+
+  /**
+   * Retrieves the collection of active and pending method exit requests.
+   *
+   * @return The collection of information on method exit requests
+   */
+  override def methodExitRequests: Seq[MethodExitRequestInfo] = {
+    methodExitManager.methodExitRequestList ++ (methodExitManager match {
+      case p: PendingMethodExitSupportLike  => p.pendingMethodExitRequests
+      case _                                => Nil
+    })
+  }
 
   /**
    * Constructs a stream of method exit events for the specified class and

@@ -10,10 +10,7 @@ import scala.util.{Success, Try}
  * Provides pending modification watchpoint capabilities to an
  * existing modification watchpoint manager.
  */
-trait PendingModificationWatchpointSupport
-  extends ModificationWatchpointManager
-  with PendingRequestSupport
-{
+trait PendingModificationWatchpointSupport extends PendingModificationWatchpointSupportLike {
   /**
    * Represents the manager used to store pending modification watchpoint
    * requests and process them later.
@@ -26,7 +23,7 @@ trait PendingModificationWatchpointSupport
    * @return The collection of successfully-processed modification
    *         watchpoint requests
    */
-  def processAllPendingModificationWatchpointRequests(): Seq[ModificationWatchpointRequestInfo] = {
+  override def processAllPendingModificationWatchpointRequests(): Seq[ModificationWatchpointRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -35,7 +32,7 @@ trait PendingModificationWatchpointSupport
    *
    * @return The collection of modification watchpoint request information
    */
-  def pendingModificationWatchpointRequests: Seq[ModificationWatchpointRequestInfo] = {
+  override def pendingModificationWatchpointRequests: Seq[ModificationWatchpointRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 
@@ -49,7 +46,7 @@ trait PendingModificationWatchpointSupport
    * @return The collection of successfully-processed modification
    *         watchpoint requests
    */
-  def processPendingModificationWatchpointRequestsForClass(
+  override def processPendingModificationWatchpointRequestsForClass(
     className: String
   ): Seq[ModificationWatchpointRequestInfo] = {
     pendingActionManager.processActions(_.data.className == className)
@@ -66,7 +63,7 @@ trait PendingModificationWatchpointSupport
    * @return The collection of successfully-processed modification
    *         watchpoint requests
    */
-  def pendingModificationWatchpointRequestsForClass(
+  override def pendingModificationWatchpointRequestsForClass(
     className: String
   ): Seq[ModificationWatchpointRequestInfo] = {
     pendingActionManager.getPendingActionData(_.data.className == className)

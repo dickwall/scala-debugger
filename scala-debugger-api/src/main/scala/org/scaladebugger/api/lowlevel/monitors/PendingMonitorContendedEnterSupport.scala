@@ -1,19 +1,15 @@
 package org.scaladebugger.api.lowlevel.monitors
 
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.utils.PendingActionManager
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 /**
  * Provides pending monitor contended enter capabilities to an existing
  * monitor contended enter manager.
  */
-trait PendingMonitorContendedEnterSupport
-  extends MonitorContendedEnterManager
-  with PendingRequestSupport
-{
+trait PendingMonitorContendedEnterSupport extends PendingMonitorContendedEnterSupportLike {
   /**
    * Represents the manager used to store pending monitor contended enter requests and
    * process them later.
@@ -25,7 +21,7 @@ trait PendingMonitorContendedEnterSupport
    *
    * @return The collection of successfully-processed monitor contended enter requests
    */
-  def processAllPendingMonitorContendedEnterRequests(): Seq[MonitorContendedEnterRequestInfo] = {
+  override def processAllPendingMonitorContendedEnterRequests(): Seq[MonitorContendedEnterRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -34,7 +30,7 @@ trait PendingMonitorContendedEnterSupport
    *
    * @return The collection of monitor contended enter requests
    */
-  def pendingMonitorContendedEnterRequests: Seq[MonitorContendedEnterRequestInfo] = {
+  override def pendingMonitorContendedEnterRequests: Seq[MonitorContendedEnterRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 

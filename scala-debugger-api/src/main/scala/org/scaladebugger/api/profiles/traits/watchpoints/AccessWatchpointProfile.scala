@@ -3,6 +3,7 @@ package org.scaladebugger.api.profiles.traits.watchpoints
 import com.sun.jdi.event.AccessWatchpointEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.watchpoints.AccessWatchpointRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
@@ -16,6 +17,13 @@ trait AccessWatchpointProfile {
   /** Represents a access watchpoint event and any associated data. */
   type AccessWatchpointEventAndData =
     (AccessWatchpointEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending access watchpoint requests.
+   *
+   * @return The collection of information on access watchpoint requests
+   */
+  def accessWatchpointRequests: Seq[AccessWatchpointRequestInfo]
 
   /**
    * Constructs a stream of access watchpoint events for field in the specified

@@ -10,10 +10,7 @@ import scala.util.{Success, Try}
  * Provides pending access watchpoint capabilities to an existing access
  * watchpoint manager.
  */
-trait PendingAccessWatchpointSupport
-  extends AccessWatchpointManager
-  with PendingRequestSupport
-{
+trait PendingAccessWatchpointSupport extends PendingAccessWatchpointSupportLike {
   /**
    * Represents the manager used to store pending access watchpoint requests
    * and process them later.
@@ -25,7 +22,7 @@ trait PendingAccessWatchpointSupport
    *
    * @return The collection of successfully-processed access watchpoint requests
    */
-  def processAllPendingAccessWatchpointRequests(): Seq[AccessWatchpointRequestInfo] = {
+  override def processAllPendingAccessWatchpointRequests(): Seq[AccessWatchpointRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -34,7 +31,7 @@ trait PendingAccessWatchpointSupport
    *
    * @return The collection of access watchpoint request information
    */
-  def pendingAccessWatchpointRequests: Seq[AccessWatchpointRequestInfo] = {
+  override def pendingAccessWatchpointRequests: Seq[AccessWatchpointRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 
@@ -46,7 +43,7 @@ trait PendingAccessWatchpointSupport
    *
    * @return The collection of successfully-processed access watchpoint requests
    */
-  def processPendingAccessWatchpointRequestsForClass(
+  override def processPendingAccessWatchpointRequestsForClass(
     className: String
   ): Seq[AccessWatchpointRequestInfo] = {
     pendingActionManager.processActions(_.data.className == className)
@@ -62,7 +59,7 @@ trait PendingAccessWatchpointSupport
    *
    * @return The collection of successfully-processed access watchpoint requests
    */
-  def pendingAccessWatchpointRequestsForClass(
+  override def pendingAccessWatchpointRequestsForClass(
     className: String
   ): Seq[AccessWatchpointRequestInfo] = {
     pendingActionManager.getPendingActionData(_.data.className == className)

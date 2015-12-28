@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.classes
 
 import com.sun.jdi.event.ClassPrepareEvent
+import org.scaladebugger.api.lowlevel.classes.ClassPrepareRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -26,6 +27,8 @@ class ClassPrepareProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[ClassPrepareEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def classPrepareRequests: Seq[ClassPrepareRequestInfo] = ???
   }
 
   private val failClassPrepareProfile = new Object with ClassPrepareProfile {
@@ -34,6 +37,8 @@ class ClassPrepareProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[ClassPrepareEventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def classPrepareRequests: Seq[ClassPrepareRequestInfo] = ???
   }
 
   describe("ClassPrepareProfile") {

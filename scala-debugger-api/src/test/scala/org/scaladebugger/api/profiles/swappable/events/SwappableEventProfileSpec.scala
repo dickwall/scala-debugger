@@ -19,6 +19,25 @@ class SwappableEventProfileSpec extends FunSpec with Matchers
   }
 
   describe("SwappableEventProfile") {
+    describe("#eventHandlers") {
+      it("should invoke the method on the underlying profile") {
+        (mockProfileManager.retrieve _).expects(*)
+          .returning(Some(mockDebugProfile)).once()
+
+        (mockDebugProfile.eventHandlers _).expects().once()
+
+        swappableDebugProfile.eventHandlers
+      }
+
+      it("should throw an exception if there is no underlying profile") {
+        (mockProfileManager.retrieve _).expects(*).returning(None).once()
+
+        intercept[AssertionError] {
+          swappableDebugProfile.eventHandlers
+        }
+      }
+    }
+
     describe("#onEventWithData") {
       // TODO: ScalaMock is causing a stack overflow exception
       ignore("should invoke the method on the underlying profile") {

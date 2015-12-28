@@ -2,8 +2,8 @@ package org.scaladebugger.api.profiles.traits.classes
 
 import com.sun.jdi.event.ClassUnloadEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.classes.ClassUnloadRequestInfo
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
-import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
 import scala.util.Try
@@ -15,6 +15,13 @@ import scala.util.Try
 trait ClassUnloadProfile {
   /** Represents a class unload event and any associated data. */
   type ClassUnloadEventAndData = (ClassUnloadEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending class unload requests.
+   *
+   * @return The collection of information on class unload requests
+   */
+  def classUnloadRequests: Seq[ClassUnloadRequestInfo]
 
   /**
    * Constructs a stream of class unload events.

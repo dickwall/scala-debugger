@@ -1,19 +1,15 @@
 package org.scaladebugger.api.lowlevel.threads
 
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.utils.PendingActionManager
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 /**
  * Provides pending thread start capabilities to an existing
  * thread start manager.
  */
-trait PendingThreadStartSupport
-  extends ThreadStartManager
-  with PendingRequestSupport
-{
+trait PendingThreadStartSupport extends PendingThreadStartSupportLike {
   /**
    * Represents the manager used to store pending thread start requests and
    * process them later.
@@ -25,7 +21,7 @@ trait PendingThreadStartSupport
    *
    * @return The collection of successfully-processed thread start requests
    */
-  def processAllPendingThreadStartRequests(): Seq[ThreadStartRequestInfo] = {
+  override def processAllPendingThreadStartRequests(): Seq[ThreadStartRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -34,7 +30,7 @@ trait PendingThreadStartSupport
    *
    * @return The collection of thread start requests
    */
-  def pendingThreadStartRequests: Seq[ThreadStartRequestInfo] = {
+  override def pendingThreadStartRequests: Seq[ThreadStartRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 

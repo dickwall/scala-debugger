@@ -3,6 +3,7 @@ package org.scaladebugger.api.profiles.traits.threads
 import com.sun.jdi.event.ThreadStartEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.threads.ThreadStartRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
@@ -15,6 +16,13 @@ import scala.util.Try
 trait ThreadStartProfile {
   /** Represents a thread start event and any associated data. */
   type ThreadStartEventAndData = (ThreadStartEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending thread start requests.
+   *
+   * @return The collection of information on thread start requests
+   */
+  def threadStartRequests: Seq[ThreadStartRequestInfo]
 
   /**
    * Constructs a stream of thread start events.

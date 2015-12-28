@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.monitors
 
 import com.sun.jdi.event.MonitorContendedEnteredEvent
+import org.scaladebugger.api.lowlevel.monitors.MonitorContendedEnteredRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -26,6 +27,8 @@ class MonitorContendedEnteredProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[MonitorContendedEnteredEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def monitorContendedEnteredRequests: Seq[MonitorContendedEnteredRequestInfo] = ???
   }
 
   private val failMonitorContendedEnteredProfile = new Object with MonitorContendedEnteredProfile {
@@ -34,6 +37,8 @@ class MonitorContendedEnteredProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[MonitorContendedEnteredEventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def monitorContendedEnteredRequests: Seq[MonitorContendedEnteredRequestInfo] = ???
   }
 
   describe("MonitorContendedEnteredProfile") {

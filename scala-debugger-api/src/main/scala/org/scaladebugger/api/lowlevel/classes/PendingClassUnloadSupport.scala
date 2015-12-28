@@ -1,19 +1,15 @@
 package org.scaladebugger.api.lowlevel.classes
 
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.utils.PendingActionManager
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 /**
  * Provides pending class unload capabilities to an existing
  * class unload manager.
  */
-trait PendingClassUnloadSupport
-  extends ClassUnloadManager
-  with PendingRequestSupport
-{
+trait PendingClassUnloadSupport extends PendingClassUnloadSupportLike {
   /**
    * Represents the manager used to store pending class unload requests and
    * process them later.
@@ -25,7 +21,7 @@ trait PendingClassUnloadSupport
    *
    * @return The collection of successfully-processed class unload requests
    */
-  def processAllPendingClassUnloadRequests(): Seq[ClassUnloadRequestInfo] = {
+  override def processAllPendingClassUnloadRequests(): Seq[ClassUnloadRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -34,7 +30,7 @@ trait PendingClassUnloadSupport
    *
    * @return The collection of class unload requests
    */
-  def pendingClassUnloadRequests: Seq[ClassUnloadRequestInfo] = {
+  override def pendingClassUnloadRequests: Seq[ClassUnloadRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 

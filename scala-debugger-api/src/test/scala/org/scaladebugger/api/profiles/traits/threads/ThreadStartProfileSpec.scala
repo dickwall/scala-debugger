@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.threads
 
 import com.sun.jdi.event.ThreadStartEvent
+import org.scaladebugger.api.lowlevel.threads.ThreadStartRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -26,6 +27,8 @@ class ThreadStartProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[ThreadStartEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def threadStartRequests: Seq[ThreadStartRequestInfo] = ???
   }
 
   private val failThreadStartProfile = new Object with ThreadStartProfile {
@@ -34,6 +37,8 @@ class ThreadStartProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[ThreadStartEventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def threadStartRequests: Seq[ThreadStartRequestInfo] = ???
   }
 
   describe("ThreadStartProfile") {

@@ -2,26 +2,26 @@ package org.scaladebugger.api.lowlevel
 
 import com.sun.jdi.ThreadReference
 import com.sun.jdi.request.EventRequestManager
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
-import org.scaladebugger.api.lowlevel.breakpoints.{BreakpointManager, BreakpointRequestInfo, DummyBreakpointManager, PendingBreakpointSupport}
+import org.scaladebugger.api.lowlevel.breakpoints._
 import org.scaladebugger.api.lowlevel.classes._
 import org.scaladebugger.api.lowlevel.events.EventManager.EventHandler
 import org.scaladebugger.api.lowlevel.events.EventType.EventType
 import org.scaladebugger.api.lowlevel.events._
-import org.scaladebugger.api.lowlevel.exceptions.{DummyExceptionManager, ExceptionManager, ExceptionRequestInfo, PendingExceptionSupport}
+import org.scaladebugger.api.lowlevel.exceptions._
 import org.scaladebugger.api.lowlevel.methods._
 import org.scaladebugger.api.lowlevel.monitors._
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
-import org.scaladebugger.api.lowlevel.steps.{DummyStepManager, PendingStepSupport, StepManager, StepRequestInfo}
+import org.scaladebugger.api.lowlevel.steps._
 import org.scaladebugger.api.lowlevel.threads._
-import org.scaladebugger.api.lowlevel.vm.{DummyVMDeathManager, PendingVMDeathSupport, VMDeathManager, VMDeathRequestInfo}
+import org.scaladebugger.api.lowlevel.vm._
 import org.scaladebugger.api.lowlevel.watchpoints._
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
+import test.PendingManagers._
 
 class ManagerContainerSpec extends FunSpec with Matchers
   with MockFactory with ParallelTestExecution
 {
-  
   describe("ManagerContainer") {
     describe("#processPendingRequests") {
       it("should create breakpoint requests if some are pending") {
@@ -304,41 +304,41 @@ class ManagerContainerSpec extends FunSpec with Matchers
         val managerContainer = ManagerContainer.usingDummyManagers()
 
         managerContainer.accessWatchpointManager shouldBe a [DummyAccessWatchpointManager]
-        managerContainer.accessWatchpointManager shouldBe a [PendingAccessWatchpointSupport]
+        managerContainer.accessWatchpointManager shouldBe a [PendingAccessWatchpointSupportLike]
         managerContainer.breakpointManager shouldBe a [DummyBreakpointManager]
-        managerContainer.breakpointManager shouldBe a [PendingBreakpointSupport]
+        managerContainer.breakpointManager shouldBe a [PendingBreakpointSupportLike]
         managerContainer.classManager should be (null)
         managerContainer.classPrepareManager shouldBe a [DummyClassPrepareManager]
-        managerContainer.classPrepareManager shouldBe a [PendingClassPrepareSupport]
+        managerContainer.classPrepareManager shouldBe a [PendingClassPrepareSupportLike]
         managerContainer.classUnloadManager shouldBe a [DummyClassUnloadManager]
-        managerContainer.classUnloadManager shouldBe a [PendingClassUnloadSupport]
+        managerContainer.classUnloadManager shouldBe a [PendingClassUnloadSupportLike]
         managerContainer.eventManager shouldBe a [DummyEventManager]
-        managerContainer.eventManager shouldBe a [PendingEventHandlerSupport]
+        managerContainer.eventManager shouldBe a [PendingEventHandlerSupportLike]
         managerContainer.exceptionManager shouldBe a [DummyExceptionManager]
-        managerContainer.exceptionManager shouldBe a [PendingExceptionSupport]
+        managerContainer.exceptionManager shouldBe a [PendingExceptionSupportLike]
         managerContainer.methodEntryManager shouldBe a [DummyMethodEntryManager]
-        managerContainer.methodEntryManager shouldBe a [PendingMethodEntrySupport]
+        managerContainer.methodEntryManager shouldBe a [PendingMethodEntrySupportLike]
         managerContainer.methodExitManager shouldBe a [DummyMethodExitManager]
-        managerContainer.methodExitManager shouldBe a [PendingMethodExitSupport]
+        managerContainer.methodExitManager shouldBe a [PendingMethodExitSupportLike]
         managerContainer.modificationWatchpointManager shouldBe a [DummyModificationWatchpointManager]
-        managerContainer.modificationWatchpointManager shouldBe a [PendingModificationWatchpointSupport]
+        managerContainer.modificationWatchpointManager shouldBe a [PendingModificationWatchpointSupportLike]
         managerContainer.monitorContendedEnteredManager shouldBe a [DummyMonitorContendedEnteredManager]
-        managerContainer.monitorContendedEnteredManager shouldBe a [PendingMonitorContendedEnteredSupport]
+        managerContainer.monitorContendedEnteredManager shouldBe a [PendingMonitorContendedEnteredSupportLike]
         managerContainer.monitorContendedEnterManager shouldBe a [DummyMonitorContendedEnterManager]
-        managerContainer.monitorContendedEnterManager shouldBe a [PendingMonitorContendedEnterSupport]
+        managerContainer.monitorContendedEnterManager shouldBe a [PendingMonitorContendedEnterSupportLike]
         managerContainer.monitorWaitedManager shouldBe a [DummyMonitorWaitedManager]
-        managerContainer.monitorWaitedManager shouldBe a [PendingMonitorWaitedSupport]
+        managerContainer.monitorWaitedManager shouldBe a [PendingMonitorWaitedSupportLike]
         managerContainer.monitorWaitManager shouldBe a [DummyMonitorWaitManager]
-        managerContainer.monitorWaitManager shouldBe a [PendingMonitorWaitSupport]
+        managerContainer.monitorWaitManager shouldBe a [PendingMonitorWaitSupportLike]
         managerContainer.requestManager should be (null)
         managerContainer.stepManager shouldBe a [DummyStepManager]
-        managerContainer.stepManager shouldBe a [PendingStepSupport]
+        managerContainer.stepManager shouldBe a [PendingStepSupportLike]
         managerContainer.threadDeathManager shouldBe a [DummyThreadDeathManager]
-        managerContainer.threadDeathManager shouldBe a [PendingThreadDeathSupport]
+        managerContainer.threadDeathManager shouldBe a [PendingThreadDeathSupportLike]
         managerContainer.threadStartManager shouldBe a [DummyThreadStartManager]
-        managerContainer.threadStartManager shouldBe a [PendingThreadStartSupport]
+        managerContainer.threadStartManager shouldBe a [PendingThreadStartSupportLike]
         managerContainer.vmDeathManager shouldBe a [DummyVMDeathManager]
-        managerContainer.vmDeathManager shouldBe a [PendingVMDeathSupport]
+        managerContainer.vmDeathManager shouldBe a [PendingVMDeathSupportLike]
       }
     }
     
@@ -593,29 +593,4 @@ class ManagerContainerSpec extends FunSpec with Matchers
     mock[VMDeathManager]
   )
 
-  //
-  // NOTE: The following classes are explicitly created due to a limitation
-  //       of ScalaMock where you cannot issue
-  //
-  //           mock[VMDeathManager with PendingRequestSupport]
-  //
-  trait TestPendingAccessWatchpointManager extends AccessWatchpointManager with PendingRequestSupport
-  trait TestPendingBreakpointManager extends BreakpointManager with PendingRequestSupport
-  trait TestPendingClassManager extends ClassManager with PendingRequestSupport
-  trait TestPendingClassPrepareManager extends ClassPrepareManager with PendingRequestSupport
-  trait TestPendingClassUnloadManager extends ClassUnloadManager with PendingRequestSupport
-  trait TestPendingEventManager extends EventManager with PendingRequestSupport
-  trait TestPendingExceptionManager extends ExceptionManager with PendingRequestSupport
-  trait TestPendingMethodEntryManager extends MethodEntryManager with PendingRequestSupport
-  trait TestPendingMethodExitManager extends MethodExitManager with PendingRequestSupport
-  trait TestPendingModificationWatchpointManager extends ModificationWatchpointManager with PendingRequestSupport
-  trait TestPendingMonitorContendedEnteredManager extends MonitorContendedEnteredManager with PendingRequestSupport
-  trait TestPendingMonitorContendedEnterManager extends MonitorContendedEnterManager with PendingRequestSupport
-  trait TestPendingMonitorWaitedManager extends MonitorWaitedManager with PendingRequestSupport
-  trait TestPendingMonitorWaitManager extends MonitorWaitManager with PendingRequestSupport
-  trait TestPendingEventRequestManager extends EventRequestManager with PendingRequestSupport
-  trait TestPendingStepManager extends StepManager with PendingRequestSupport
-  trait TestPendingThreadDeathManager extends ThreadDeathManager with PendingRequestSupport
-  trait TestPendingThreadStartManager extends ThreadStartManager with PendingRequestSupport
-  trait TestPendingVMDeathManager extends VMDeathManager with PendingRequestSupport
 }

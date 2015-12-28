@@ -1,19 +1,15 @@
 package org.scaladebugger.api.lowlevel.classes
 
-import org.scaladebugger.api.lowlevel.PendingRequestSupport
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.utils.PendingActionManager
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 /**
  * Provides pending class prepare capabilities to an existing
  * class prepare manager.
  */
-trait PendingClassPrepareSupport
-  extends ClassPrepareManager
-  with PendingRequestSupport
-{
+trait PendingClassPrepareSupport extends PendingClassPrepareSupportLike {
   /**
    * Represents the manager used to store pending class prepare requests and
    * process them later.
@@ -25,7 +21,7 @@ trait PendingClassPrepareSupport
    *
    * @return The collection of successfully-processed class prepare requests
    */
-  def processAllPendingClassPrepareRequests(): Seq[ClassPrepareRequestInfo] = {
+  override def processAllPendingClassPrepareRequests(): Seq[ClassPrepareRequestInfo] = {
     pendingActionManager.processAllActions().map(_.data)
   }
 
@@ -34,7 +30,7 @@ trait PendingClassPrepareSupport
    *
    * @return The collection of class prepare requests
    */
-  def pendingClassPrepareRequests: Seq[ClassPrepareRequestInfo] = {
+  override def pendingClassPrepareRequests: Seq[ClassPrepareRequestInfo] = {
     pendingActionManager.getPendingActionData(_ => true)
   }
 

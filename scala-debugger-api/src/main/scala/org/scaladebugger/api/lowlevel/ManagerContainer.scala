@@ -54,71 +54,71 @@ case class ManagerContainer(
   def processPendingRequests(
     managerContainer: ManagerContainer
   ): Unit = managerContainer.productIterator.foreach(m => Try(m match {
-    case accessWatchpointManager: PendingAccessWatchpointSupport =>
+    case accessWatchpointManager: PendingAccessWatchpointSupportLike =>
       accessWatchpointManager.pendingAccessWatchpointRequests.foreach(
         this.accessWatchpointManager.createAccessWatchpointRequestFromInfo
       )
-    case breakpointManager: PendingBreakpointSupport =>
+    case breakpointManager: PendingBreakpointSupportLike =>
       breakpointManager.pendingBreakpointRequests.foreach(
         this.breakpointManager.createBreakpointRequestFromInfo
       )
-    case classPrepareManager: PendingClassPrepareSupport =>
+    case classPrepareManager: PendingClassPrepareSupportLike =>
       classPrepareManager.pendingClassPrepareRequests.foreach(
         this.classPrepareManager.createClassPrepareRequestFromInfo
       )
-    case classUnloadManager: PendingClassUnloadSupport =>
+    case classUnloadManager: PendingClassUnloadSupportLike =>
       classUnloadManager.pendingClassUnloadRequests.foreach(
         this.classUnloadManager.createClassUnloadRequestFromInfo
       )
-    case eventManager: PendingEventHandlerSupport =>
+    case eventManager: PendingEventHandlerSupportLike =>
       eventManager.pendingEventHandlers.foreach(
         this.eventManager.addEventHandlerFromInfo
       )
-    case exceptionManager: PendingExceptionSupport =>
+    case exceptionManager: PendingExceptionSupportLike =>
       exceptionManager.pendingExceptionRequests.foreach(
         this.exceptionManager.createExceptionRequestFromInfo
       )
-    case methodEntryManager: PendingMethodEntrySupport =>
+    case methodEntryManager: PendingMethodEntrySupportLike =>
       methodEntryManager.pendingMethodEntryRequests.foreach(
         this.methodEntryManager.createMethodEntryRequestFromInfo
       )
-    case methodExitManager: PendingMethodExitSupport =>
+    case methodExitManager: PendingMethodExitSupportLike =>
       methodExitManager.pendingMethodExitRequests.foreach(
         this.methodExitManager.createMethodExitRequestFromInfo
       )
-    case modificationWatchpointManager: PendingModificationWatchpointSupport =>
+    case modificationWatchpointManager: PendingModificationWatchpointSupportLike =>
       modificationWatchpointManager.pendingModificationWatchpointRequests.foreach(
         this.modificationWatchpointManager.createModificationWatchpointRequestFromInfo
       )
-    case monitorContendedEnteredManager: PendingMonitorContendedEnteredSupport =>
+    case monitorContendedEnteredManager: PendingMonitorContendedEnteredSupportLike =>
       monitorContendedEnteredManager.pendingMonitorContendedEnteredRequests.foreach(
         this.monitorContendedEnteredManager.createMonitorContendedEnteredRequestFromInfo
       )
-    case monitorContendedEnterManager: PendingMonitorContendedEnterSupport =>
+    case monitorContendedEnterManager: PendingMonitorContendedEnterSupportLike =>
       monitorContendedEnterManager.pendingMonitorContendedEnterRequests.foreach(
         this.monitorContendedEnterManager.createMonitorContendedEnterRequestFromInfo
       )
-    case monitorWaitedManager: PendingMonitorWaitedSupport =>
+    case monitorWaitedManager: PendingMonitorWaitedSupportLike =>
       monitorWaitedManager.pendingMonitorWaitedRequests.foreach(
         this.monitorWaitedManager.createMonitorWaitedRequestFromInfo
       )
-    case monitorWaitManager: PendingMonitorWaitSupport =>
+    case monitorWaitManager: PendingMonitorWaitSupportLike =>
       monitorWaitManager.pendingMonitorWaitRequests.foreach(
         this.monitorWaitManager.createMonitorWaitRequestFromInfo
       )
-    case stepManager: PendingStepSupport =>
+    case stepManager: PendingStepSupportLike =>
       stepManager.pendingStepRequests.foreach(
         this.stepManager.createStepRequestFromInfo
       )
-    case threadDeathManager: PendingThreadDeathSupport =>
+    case threadDeathManager: PendingThreadDeathSupportLike =>
       threadDeathManager.pendingThreadDeathRequests.foreach(
         this.threadDeathManager.createThreadDeathRequestFromInfo
       )
-    case threadStartManager: PendingThreadStartSupport =>
+    case threadStartManager: PendingThreadStartSupportLike =>
       threadStartManager.pendingThreadStartRequests.foreach(
         this.threadStartManager.createThreadStartRequestFromInfo
       )
-    case vmDeathManager: PendingVMDeathSupport =>
+    case vmDeathManager: PendingVMDeathSupportLike =>
       vmDeathManager.pendingVMDeathRequests.foreach(
         this.vmDeathManager.createVMDeathRequestFromInfo
       )

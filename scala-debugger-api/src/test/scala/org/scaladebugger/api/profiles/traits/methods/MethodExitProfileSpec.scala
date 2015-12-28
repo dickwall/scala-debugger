@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.methods
 
 import com.sun.jdi.event.MethodExitEvent
+import org.scaladebugger.api.lowlevel.methods.MethodExitRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -28,6 +29,8 @@ class MethodExitProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[MethodExitEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def methodExitRequests: Seq[MethodExitRequestInfo] = ???
   }
 
   private val failMethodExitProfile = new Object with MethodExitProfile {
@@ -38,6 +41,8 @@ class MethodExitProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[MethodExitEventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def methodExitRequests: Seq[MethodExitRequestInfo] = ???
   }
 
   describe("MethodExitProfile") {

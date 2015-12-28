@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.methods
 
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.methods.MethodEntryRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.methods.MethodEntryProfile
@@ -24,5 +25,9 @@ trait SwappableMethodEntryProfile extends MethodEntryProfile {
       methodName,
       extraArguments: _*
     )
+  }
+
+  override def methodEntryRequests: Seq[MethodEntryRequestInfo] = {
+    withCurrentProfile.methodEntryRequests
   }
 }

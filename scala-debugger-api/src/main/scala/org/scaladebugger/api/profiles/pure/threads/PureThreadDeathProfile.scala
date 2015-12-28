@@ -9,7 +9,7 @@ import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
 import org.scaladebugger.api.lowlevel.events.{JDIEventArgument, EventManager}
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
-import org.scaladebugger.api.lowlevel.threads.{ThreadDeathManager, StandardThreadDeathManager}
+import org.scaladebugger.api.lowlevel.threads._
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
@@ -42,6 +42,22 @@ trait PureThreadDeathProfile extends ThreadDeathProfile {
     Seq[JDIArgument],
     AtomicInteger
   ]().asScala
+
+  /**
+   * Retrieves the collection of active and pending thread death requests.
+   *
+   * @return The collection of information on thread death requests
+   */
+  override def threadDeathRequests: Seq[ThreadDeathRequestInfo] = {
+    val activeRequests = threadDeathManager.threadDeathRequestList.flatMap(
+      threadDeathManager.getThreadDeathRequestInfo
+    )
+
+    activeRequests ++ (threadDeathManager match {
+      case p: PendingThreadDeathSupportLike => p.pendingThreadDeathRequests
+      case _                                => Nil
+    })
+  }
 
   /**
    * Constructs a stream of thread start events.

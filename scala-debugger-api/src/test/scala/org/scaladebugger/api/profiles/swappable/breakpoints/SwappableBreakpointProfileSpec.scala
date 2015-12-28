@@ -18,6 +18,25 @@ class SwappableBreakpointProfileSpec extends FunSpec with Matchers
   }
 
   describe("SwappableBreakpointProfile") {
+    describe("#breakpointRequests") {
+      it("should invoke the method on the underlying profile") {
+        (mockProfileManager.retrieve _).expects(*)
+          .returning(Some(mockDebugProfile)).once()
+
+        (mockDebugProfile.breakpointRequests _).expects().once()
+
+        swappableDebugProfile.breakpointRequests
+      }
+
+      it("should throw an exception if there is no underlying profile") {
+        (mockProfileManager.retrieve _).expects(*).returning(None).once()
+
+        intercept[AssertionError] {
+          swappableDebugProfile.breakpointRequests
+        }
+      }
+    }
+
     describe("#onBreakpointWithData") {
       it("should invoke the method on the underlying profile") {
         val fileName = "some file"

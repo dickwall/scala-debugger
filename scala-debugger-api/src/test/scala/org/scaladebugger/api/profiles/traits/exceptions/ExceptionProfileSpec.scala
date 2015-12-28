@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.exceptions
 
 import com.sun.jdi.event.ExceptionEvent
+import org.scaladebugger.api.lowlevel.exceptions.ExceptionRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -37,9 +38,13 @@ class ExceptionProfileSpec extends FunSpec with Matchers with ParallelTestExecut
     ): Try[IdentityPipeline[ExceptionEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def exceptionRequests: Seq[ExceptionRequestInfo] = ???
   }
 
   private val failExceptionProfile = new Object with ExceptionProfile {
+    override def exceptionRequests: Seq[ExceptionRequestInfo] = ???
+
     override def onExceptionWithData(
       exceptionName: String,
       notifyCaught: Boolean,

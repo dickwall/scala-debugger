@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.threads
 
 import com.sun.jdi.event.ThreadDeathEvent
+import org.scaladebugger.api.lowlevel.threads.ThreadDeathRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -26,6 +27,8 @@ class ThreadDeathProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[ThreadDeathEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def threadDeathRequests: Seq[ThreadDeathRequestInfo] = ???
   }
 
   private val failThreadDeathProfile = new Object with ThreadDeathProfile {
@@ -34,6 +37,8 @@ class ThreadDeathProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[ThreadDeathEventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def threadDeathRequests: Seq[ThreadDeathRequestInfo] = ???
   }
 
   describe("ThreadDeathProfile") {

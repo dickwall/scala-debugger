@@ -10,7 +10,7 @@ import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
 import org.scaladebugger.api.lowlevel.requests.filters.ThreadFilter
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
-import org.scaladebugger.api.lowlevel.steps.{StepManager, StandardStepManager}
+import org.scaladebugger.api.lowlevel.steps.{PendingStepSupportLike, StepRequestInfo, StepManager, StandardStepManager}
 import org.scaladebugger.api.lowlevel.events.{JDIEventArgument, EventManager}
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.pipelines.{Operation, Pipeline}
@@ -40,6 +40,83 @@ class PureStepProfileSpec extends FunSpec with Matchers
   }
 
   describe("PureStepProfile") {
+    describe("#stepRequests") {
+      it("should include all active requests") {
+        val expected = Seq(
+          StepRequestInfo(
+            TestRequestId,
+            false,
+            mock[ThreadReference],
+            0,
+            1
+          )
+        )
+
+        val mockStepManager = mock[PendingStepSupportLike]
+        val pureStepProfile = new Object with PureStepProfile {
+          override protected val stepManager = mockStepManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockStepManager.stepRequestList _).expects()
+          .returning(expected).once()
+
+        (mockStepManager.pendingStepRequests _).expects()
+          .returning(Nil).once()
+
+        val actual = pureStepProfile.stepRequests
+
+        actual should be (expected)
+      }
+
+      it("should include pending requests if supported") {
+        val expected = Seq(
+          StepRequestInfo(
+            TestRequestId,
+            false,
+            mock[ThreadReference],
+            0,
+            1
+          )
+        )
+
+        val mockStepManager = mock[PendingStepSupportLike]
+        val pureStepProfile = new Object with PureStepProfile {
+          override protected val stepManager = mockStepManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockStepManager.stepRequestList _).expects()
+          .returning(Nil).once()
+
+        (mockStepManager.pendingStepRequests _).expects()
+          .returning(expected).once()
+
+        val actual = pureStepProfile.stepRequests
+
+        actual should be (expected)
+      }
+
+      it("should only include active requests if pending unsupported") {
+        val expected = Seq(
+          StepRequestInfo(
+            TestRequestId,
+            false,
+            mock[ThreadReference],
+            0,
+            1
+          )
+        )
+
+        (mockStepManager.stepRequestList _).expects()
+          .returning(expected).once()
+
+        val actual = pureStepProfile.stepRequests
+
+        actual should be (expected)
+      }
+    }
+
     describe("#stepIntoLineWithData") {
       it("should create a new step request and pipeline whose future is returned") {
         val expected = (mock[StepEvent], Nil)

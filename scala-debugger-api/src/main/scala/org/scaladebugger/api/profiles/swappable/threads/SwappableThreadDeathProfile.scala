@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.threads
 
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.threads.ThreadDeathRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.threads.ThreadDeathProfile
@@ -18,5 +19,9 @@ trait SwappableThreadDeathProfile extends ThreadDeathProfile {
     extraArguments: JDIArgument*
   ): Try[IdentityPipeline[ThreadDeathEventAndData]] = {
     withCurrentProfile.onThreadDeathWithData(extraArguments: _*)
+  }
+
+  override def threadDeathRequests: Seq[ThreadDeathRequestInfo] = {
+    withCurrentProfile.threadDeathRequests
   }
 }

@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.events
 
 import com.sun.jdi.event.Event
+import org.scaladebugger.api.lowlevel.events.EventHandlerInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -28,6 +29,8 @@ class EventProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[EventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def eventHandlers: Seq[EventHandlerInfo] = ???
   }
 
   private val failEventProfile = new Object with EventProfile {
@@ -37,6 +40,8 @@ class EventProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[EventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def eventHandlers: Seq[EventHandlerInfo] = ???
   }
 
   describe("EventProfile") {

@@ -1,19 +1,17 @@
 package org.scaladebugger.api.profiles.pure.monitors
 
-import com.sun.jdi.event.{Event, EventQueue}
-import com.sun.jdi.request.EventRequestManager
+import com.sun.jdi.event.Event
+import org.scaladebugger.api.lowlevel.events.EventManager
+import org.scaladebugger.api.lowlevel.events.EventType.MonitorContendedEnterEventType
+import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
+import org.scaladebugger.api.lowlevel.monitors.{MonitorContendedEnterManager, MonitorContendedEnterRequestInfo, PendingMonitorContendedEnterSupportLike}
+import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
+import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
+import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.profiles.Constants
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
-import org.scaladebugger.api.lowlevel.events.EventManager
-import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
-import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
-import org.scaladebugger.api.lowlevel.monitors.{MonitorContendedEnterManager, MonitorContendedEnterRequestInfo, StandardMonitorContendedEnterManager}
-import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
-import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
-import org.scaladebugger.api.lowlevel.events.EventType.MonitorContendedEnterEventType
-import org.scaladebugger.api.pipelines.Pipeline
-import org.scaladebugger.api.utils.LoopingTaskRunner
 import test.JDIMockHelpers
 
 import scala.util.{Failure, Success}
@@ -39,6 +37,69 @@ with ParallelTestExecution with MockFactory with JDIMockHelpers {
   }
 
   describe("PureMonitorContendedEnterProfile") {
+    describe("#monitorContendedEnterRequests") {
+      it("should include all active requests") {
+        val expected = Seq(
+          MonitorContendedEnterRequestInfo(TestRequestId)
+        )
+
+        val mockMonitorContendedEnterManager = mock[PendingMonitorContendedEnterSupportLike]
+        val pureMonitorContendedEnterProfile = new Object with PureMonitorContendedEnterProfile {
+          override protected val monitorContendedEnterManager = mockMonitorContendedEnterManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockMonitorContendedEnterManager.monitorContendedEnterRequestList _).expects()
+          .returning(expected.map(_.requestId)).once()
+        (mockMonitorContendedEnterManager.getMonitorContendedEnterRequestInfo _)
+          .expects(TestRequestId).returning(expected.headOption).once()
+
+        (mockMonitorContendedEnterManager.pendingMonitorContendedEnterRequests _).expects()
+          .returning(Nil).once()
+
+        val actual = pureMonitorContendedEnterProfile.monitorContendedEnterRequests
+
+        actual should be (expected)
+      }
+
+      it("should include pending requests if supported") {
+        val expected = Seq(
+          MonitorContendedEnterRequestInfo(TestRequestId)
+        )
+
+        val mockMonitorContendedEnterManager = mock[PendingMonitorContendedEnterSupportLike]
+        val pureMonitorContendedEnterProfile = new Object with PureMonitorContendedEnterProfile {
+          override protected val monitorContendedEnterManager = mockMonitorContendedEnterManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockMonitorContendedEnterManager.monitorContendedEnterRequestList _).expects()
+          .returning(Nil).once()
+
+        (mockMonitorContendedEnterManager.pendingMonitorContendedEnterRequests _).expects()
+          .returning(expected).once()
+
+        val actual = pureMonitorContendedEnterProfile.monitorContendedEnterRequests
+
+        actual should be (expected)
+      }
+
+      it("should only include active requests if pending unsupported") {
+        val expected = Seq(
+          MonitorContendedEnterRequestInfo(TestRequestId)
+        )
+
+        (mockMonitorContendedEnterManager.monitorContendedEnterRequestList _).expects()
+          .returning(expected.map(_.requestId)).once()
+        (mockMonitorContendedEnterManager.getMonitorContendedEnterRequestInfo _)
+          .expects(TestRequestId).returning(expected.headOption).once()
+
+        val actual = pureMonitorContendedEnterProfile.monitorContendedEnterRequests
+
+        actual should be (expected)
+      }
+    }
+
     describe("#onMonitorContendedEnterWithData") {
       it("should create a new request if one has not be made yet") {
         val arguments = Seq(mock[JDIRequestArgument])

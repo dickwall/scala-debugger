@@ -3,6 +3,7 @@ package org.scaladebugger.api.profiles.traits.watchpoints
 import com.sun.jdi.event.ModificationWatchpointEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.watchpoints.ModificationWatchpointRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 
@@ -16,6 +17,14 @@ trait ModificationWatchpointProfile {
   /** Represents a modification watchpoint event and any associated data. */
   type ModificationWatchpointEventAndData =
     (ModificationWatchpointEvent, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active and pending modification watchpoint
+   * requests.
+   *
+   * @return The collection of information on modification watchpoint requests
+   */
+  def modificationWatchpointRequests: Seq[ModificationWatchpointRequestInfo]
 
   /**
    * Constructs a stream of modification watchpoint events for field in the

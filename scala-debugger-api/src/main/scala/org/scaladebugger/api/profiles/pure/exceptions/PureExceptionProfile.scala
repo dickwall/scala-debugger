@@ -7,7 +7,7 @@ import com.sun.jdi.event.ExceptionEvent
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
-import org.scaladebugger.api.lowlevel.exceptions.ExceptionManager
+import org.scaladebugger.api.lowlevel.exceptions.{PendingExceptionSupportLike, PendingExceptionSupport, ExceptionRequestInfo, ExceptionManager}
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
@@ -42,6 +42,18 @@ trait PureExceptionProfile extends ExceptionProfile {
     (String, Boolean, Boolean, Seq[JDIEventArgument]),
     AtomicInteger
   ]().asScala
+
+  /**
+   * Retrieves the collection of active and pending exceptions requests.
+   *
+   * @return The collection of information on exception requests
+   */
+  override def exceptionRequests: Seq[ExceptionRequestInfo] = {
+    exceptionManager.exceptionRequestList ++ (exceptionManager match {
+      case p: PendingExceptionSupportLike => p.pendingExceptionRequests
+      case _                              => Nil
+    })
+  }
 
   /**
    * Constructs a stream of exception events for all exceptions.

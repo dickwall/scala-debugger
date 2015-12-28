@@ -1,20 +1,18 @@
 package org.scaladebugger.api.profiles.pure.vm
 
-import com.sun.jdi.event.{Event, EventQueue}
-import com.sun.jdi.request.EventRequestManager
-import org.scaladebugger.api.profiles.Constants
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
+import com.sun.jdi.event.Event
 import org.scaladebugger.api.lowlevel.events.EventManager
+import org.scaladebugger.api.lowlevel.events.EventType.VMDeathEventType
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
-import org.scaladebugger.api.lowlevel.vm.{VMDeathManager, VMDeathRequestInfo, StandardVMDeathManager}
+import org.scaladebugger.api.lowlevel.vm.{PendingVMDeathSupportLike, VMDeathManager, VMDeathRequestInfo}
 import org.scaladebugger.api.pipelines.Pipeline
-import org.scaladebugger.api.utils.LoopingTaskRunner
+import org.scaladebugger.api.profiles.Constants
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import test.JDIMockHelpers
-import org.scaladebugger.api.lowlevel.events.EventType.VMDeathEventType
 
 import scala.util.{Failure, Success}
 
@@ -39,6 +37,69 @@ with ParallelTestExecution with MockFactory with JDIMockHelpers
   }
 
   describe("PureVMDeathProfile") {
+    describe("#vmDeathRequests") {
+      it("should include all active requests") {
+        val expected = Seq(
+          VMDeathRequestInfo(TestRequestId)
+        )
+
+        val mockVMDeathManager = mock[PendingVMDeathSupportLike]
+        val pureVMDeathProfile = new Object with PureVMDeathProfile {
+          override protected val vmDeathManager = mockVMDeathManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockVMDeathManager.vmDeathRequestList _).expects()
+          .returning(expected.map(_.requestId)).once()
+        (mockVMDeathManager.getVMDeathRequestInfo _)
+          .expects(TestRequestId).returning(expected.headOption).once()
+
+        (mockVMDeathManager.pendingVMDeathRequests _).expects()
+          .returning(Nil).once()
+
+        val actual = pureVMDeathProfile.vmDeathRequests
+
+        actual should be (expected)
+      }
+
+      it("should include pending requests if supported") {
+        val expected = Seq(
+          VMDeathRequestInfo(TestRequestId)
+        )
+
+        val mockVMDeathManager = mock[PendingVMDeathSupportLike]
+        val pureVMDeathProfile = new Object with PureVMDeathProfile {
+          override protected val vmDeathManager = mockVMDeathManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockVMDeathManager.vmDeathRequestList _).expects()
+          .returning(Nil).once()
+
+        (mockVMDeathManager.pendingVMDeathRequests _).expects()
+          .returning(expected).once()
+
+        val actual = pureVMDeathProfile.vmDeathRequests
+
+        actual should be (expected)
+      }
+
+      it("should only include active requests if pending unsupported") {
+        val expected = Seq(
+          VMDeathRequestInfo(TestRequestId)
+        )
+
+        (mockVMDeathManager.vmDeathRequestList _).expects()
+          .returning(expected.map(_.requestId)).once()
+        (mockVMDeathManager.getVMDeathRequestInfo _)
+          .expects(TestRequestId).returning(expected.headOption).once()
+
+        val actual = pureVMDeathProfile.vmDeathRequests
+
+        actual should be (expected)
+      }
+    }
+
     describe("#onVMDeathWithData") {
       it("should create a new request if one has not be made yet") {
         val arguments = Seq(mock[JDIRequestArgument])

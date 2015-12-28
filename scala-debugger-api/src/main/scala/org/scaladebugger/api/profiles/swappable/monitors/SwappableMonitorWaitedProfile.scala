@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.monitors
 
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.monitors.MonitorWaitedRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.monitors.MonitorWaitedProfile
@@ -18,5 +19,9 @@ trait SwappableMonitorWaitedProfile extends MonitorWaitedProfile {
     extraArguments: JDIArgument*
   ): Try[IdentityPipeline[MonitorWaitedEventAndData]] = {
     withCurrentProfile.onMonitorWaitedWithData(extraArguments: _*)
+  }
+
+  override def monitorWaitedRequests: Seq[MonitorWaitedRequestInfo] = {
+    withCurrentProfile.monitorWaitedRequests
   }
 }

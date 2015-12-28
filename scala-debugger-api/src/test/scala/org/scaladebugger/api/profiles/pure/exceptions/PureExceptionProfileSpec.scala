@@ -1,17 +1,17 @@
 package org.scaladebugger.api.profiles.pure.exceptions
 
 import com.sun.jdi.event.Event
-import org.scaladebugger.api.profiles.Constants
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.events.EventManager
 import org.scaladebugger.api.lowlevel.events.EventType.ExceptionEventType
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
-import org.scaladebugger.api.lowlevel.exceptions.ExceptionManager
+import org.scaladebugger.api.lowlevel.exceptions.{ExceptionManager, ExceptionRequestInfo, PendingExceptionSupportLike}
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
 import org.scaladebugger.api.pipelines.Pipeline
+import org.scaladebugger.api.profiles.Constants
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import test.JDIMockHelpers
 
 import scala.util.{Failure, Success}
@@ -37,6 +37,65 @@ class PureExceptionProfileSpec extends FunSpec with Matchers
   }
 
   describe("PureExceptionProfile") {
+    describe("#exceptionRequests") {
+      it("should include all active requests") {
+        val expected = Seq(
+          ExceptionRequestInfo(TestRequestId, "some.exception.class", true, false)
+        )
+
+        val mockExceptionManager = mock[PendingExceptionSupportLike]
+        val pureExceptionProfile = new Object with PureExceptionProfile {
+          override protected val exceptionManager = mockExceptionManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockExceptionManager.exceptionRequestList _).expects()
+          .returning(expected).once()
+
+        (mockExceptionManager.pendingExceptionRequests _).expects()
+          .returning(Nil).once()
+
+        val actual = pureExceptionProfile.exceptionRequests
+
+        actual should be (expected)
+      }
+
+      it("should include pending requests if supported") {
+        val expected = Seq(
+          ExceptionRequestInfo(TestRequestId, "some.exception.class", true, false)
+        )
+
+        val mockExceptionManager = mock[PendingExceptionSupportLike]
+        val pureExceptionProfile = new Object with PureExceptionProfile {
+          override protected val exceptionManager = mockExceptionManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockExceptionManager.exceptionRequestList _).expects()
+          .returning(Nil).once()
+
+        (mockExceptionManager.pendingExceptionRequests _).expects()
+          .returning(expected).once()
+
+        val actual = pureExceptionProfile.exceptionRequests
+
+        actual should be (expected)
+      }
+
+      it("should only include active requests if pending unsupported") {
+        val expected = Seq(
+          ExceptionRequestInfo(TestRequestId, "some.exception.class", true, false)
+        )
+
+        (mockExceptionManager.exceptionRequestList _).expects()
+          .returning(expected).once()
+
+        val actual = pureExceptionProfile.exceptionRequests
+
+        actual should be (expected)
+      }
+    }
+
     describe("#onExceptionWithData") {
       it("should create a new request if one has not be made yet") {
         val exceptionName = "some.exception"

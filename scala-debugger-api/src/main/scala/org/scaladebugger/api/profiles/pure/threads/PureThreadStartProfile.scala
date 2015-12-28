@@ -9,7 +9,7 @@ import org.scaladebugger.api.lowlevel.events.{EventManager, JDIEventArgument}
 import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
-import org.scaladebugger.api.lowlevel.threads.{ThreadStartManager, StandardThreadStartManager}
+import org.scaladebugger.api.lowlevel.threads._
 import org.scaladebugger.api.lowlevel.utils.JDIArgumentGroup
 import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
@@ -42,6 +42,22 @@ trait PureThreadStartProfile extends ThreadStartProfile {
     Seq[JDIArgument],
     AtomicInteger
   ]().asScala
+
+  /**
+   * Retrieves the collection of active and pending thread start requests.
+   *
+   * @return The collection of information on thread start requests
+   */
+  override def threadStartRequests: Seq[ThreadStartRequestInfo] = {
+    val activeRequests = threadStartManager.threadStartRequestList.flatMap(
+      threadStartManager.getThreadStartRequestInfo
+    )
+
+    activeRequests ++ (threadStartManager match {
+      case p: PendingThreadStartSupportLike => p.pendingThreadStartRequests
+      case _                                => Nil
+    })
+  }
 
   /**
    * Constructs a stream of thread start events.

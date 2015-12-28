@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.traits.watchpoints
 
 import com.sun.jdi.event.AccessWatchpointEvent
+import org.scaladebugger.api.lowlevel.watchpoints.AccessWatchpointRequestInfo
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.JDIArgument
@@ -28,6 +29,8 @@ class AccessWatchpointProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[AccessWatchpointEventAndData]] = {
       Success(TestPipelineWithData)
     }
+
+    override def accessWatchpointRequests: Seq[AccessWatchpointRequestInfo] = ???
   }
 
   private val failAccessWatchpointProfile = new Object with AccessWatchpointProfile {
@@ -38,6 +41,8 @@ class AccessWatchpointProfileSpec extends FunSpec with Matchers
     ): Try[IdentityPipeline[AccessWatchpointEventAndData]] = {
       Failure(TestThrowable)
     }
+
+    override def accessWatchpointRequests: Seq[AccessWatchpointRequestInfo] = ???
   }
 
   describe("AccessWatchpointProfile") {

@@ -2,6 +2,7 @@ package org.scaladebugger.api.profiles.traits.events
 
 import com.sun.jdi.event.Event
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.events.EventHandlerInfo
 import org.scaladebugger.api.lowlevel.events.EventType.EventType
 import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
 import org.scaladebugger.api.pipelines.Pipeline
@@ -16,6 +17,13 @@ import scala.util.Try
 trait EventProfile {
   /** Represents a breakpoint event and any associated data. */
   type EventAndData = (Event, Seq[JDIEventDataResult])
+
+  /**
+   * Retrieves the collection of active event handlers.
+   *
+   * @return The collection of information on event handlers
+   */
+  def eventHandlers: Seq[EventHandlerInfo]
 
   /**
    * Constructs a stream of events for the specified event type.

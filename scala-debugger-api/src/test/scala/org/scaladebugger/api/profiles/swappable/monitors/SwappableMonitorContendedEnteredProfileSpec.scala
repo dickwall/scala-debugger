@@ -18,6 +18,25 @@ class SwappableMonitorContendedEnteredProfileSpec extends FunSpec with Matchers
   }
 
   describe("SwappableMonitorContendedEnteredProfile") {
+    describe("#monitorContendedEnteredRequests") {
+      it("should invoke the method on the underlying profile") {
+        (mockProfileManager.retrieve _).expects(*)
+          .returning(Some(mockDebugProfile)).once()
+
+        (mockDebugProfile.monitorContendedEnteredRequests _).expects().once()
+
+        swappableDebugProfile.monitorContendedEnteredRequests
+      }
+
+      it("should throw an exception if there is no underlying profile") {
+        (mockProfileManager.retrieve _).expects(*).returning(None).once()
+
+        intercept[AssertionError] {
+          swappableDebugProfile.monitorContendedEnteredRequests
+        }
+      }
+    }
+
     describe("#onMonitorContendedEnteredWithData") {
       it("should invoke the method on the underlying profile") {
         val arguments = Seq(mock[JDIArgument])

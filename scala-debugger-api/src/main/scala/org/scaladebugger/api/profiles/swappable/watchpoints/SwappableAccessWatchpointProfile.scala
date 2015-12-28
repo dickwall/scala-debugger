@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.watchpoints
 
 import org.scaladebugger.api.lowlevel.JDIArgument
+import org.scaladebugger.api.lowlevel.watchpoints.AccessWatchpointRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.watchpoints.AccessWatchpointProfile
@@ -24,5 +25,9 @@ trait SwappableAccessWatchpointProfile extends AccessWatchpointProfile {
       fieldName,
       extraArguments: _*
     )
+  }
+
+  override def accessWatchpointRequests: Seq[AccessWatchpointRequestInfo] = {
+    withCurrentProfile.accessWatchpointRequests
   }
 }

@@ -1,19 +1,17 @@
 package org.scaladebugger.api.profiles.pure.monitors
 
-import com.sun.jdi.event.{Event, EventQueue}
-import com.sun.jdi.request.EventRequestManager
+import com.sun.jdi.event.Event
+import org.scaladebugger.api.lowlevel.events.EventManager
+import org.scaladebugger.api.lowlevel.events.EventType.MonitorWaitedEventType
+import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
+import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
+import org.scaladebugger.api.lowlevel.monitors.{MonitorWaitedManager, MonitorWaitedRequestInfo, PendingMonitorWaitedSupportLike}
+import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
+import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
+import org.scaladebugger.api.pipelines.Pipeline
 import org.scaladebugger.api.profiles.Constants
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
-import org.scaladebugger.api.lowlevel.events.EventManager
-import org.scaladebugger.api.lowlevel.events.data.JDIEventDataResult
-import org.scaladebugger.api.lowlevel.events.filters.UniqueIdPropertyFilter
-import org.scaladebugger.api.lowlevel.monitors.{MonitorWaitedManager, MonitorWaitedRequestInfo, StandardMonitorWaitedManager}
-import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
-import org.scaladebugger.api.lowlevel.requests.properties.UniqueIdProperty
-import org.scaladebugger.api.lowlevel.events.EventType.MonitorWaitedEventType
-import org.scaladebugger.api.pipelines.Pipeline
-import org.scaladebugger.api.utils.LoopingTaskRunner
 import test.JDIMockHelpers
 
 import scala.util.{Failure, Success}
@@ -39,6 +37,69 @@ with ParallelTestExecution with MockFactory with JDIMockHelpers
   }
 
   describe("PureMonitorWaitedProfile") {
+    describe("#monitorWaitedRequests") {
+      it("should include all active requests") {
+        val expected = Seq(
+          MonitorWaitedRequestInfo(TestRequestId)
+        )
+
+        val mockMonitorWaitedManager = mock[PendingMonitorWaitedSupportLike]
+        val pureMonitorWaitedProfile = new Object with PureMonitorWaitedProfile {
+          override protected val monitorWaitedManager = mockMonitorWaitedManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockMonitorWaitedManager.monitorWaitedRequestList _).expects()
+          .returning(expected.map(_.requestId)).once()
+        (mockMonitorWaitedManager.getMonitorWaitedRequestInfo _)
+          .expects(TestRequestId).returning(expected.headOption).once()
+
+        (mockMonitorWaitedManager.pendingMonitorWaitedRequests _).expects()
+          .returning(Nil).once()
+
+        val actual = pureMonitorWaitedProfile.monitorWaitedRequests
+
+        actual should be (expected)
+      }
+
+      it("should include pending requests if supported") {
+        val expected = Seq(
+          MonitorWaitedRequestInfo(TestRequestId)
+        )
+
+        val mockMonitorWaitedManager = mock[PendingMonitorWaitedSupportLike]
+        val pureMonitorWaitedProfile = new Object with PureMonitorWaitedProfile {
+          override protected val monitorWaitedManager = mockMonitorWaitedManager
+          override protected val eventManager: EventManager = mockEventManager
+        }
+
+        (mockMonitorWaitedManager.monitorWaitedRequestList _).expects()
+          .returning(Nil).once()
+
+        (mockMonitorWaitedManager.pendingMonitorWaitedRequests _).expects()
+          .returning(expected).once()
+
+        val actual = pureMonitorWaitedProfile.monitorWaitedRequests
+
+        actual should be (expected)
+      }
+
+      it("should only include active requests if pending unsupported") {
+        val expected = Seq(
+          MonitorWaitedRequestInfo(TestRequestId)
+        )
+
+        (mockMonitorWaitedManager.monitorWaitedRequestList _).expects()
+          .returning(expected.map(_.requestId)).once()
+        (mockMonitorWaitedManager.getMonitorWaitedRequestInfo _)
+          .expects(TestRequestId).returning(expected.headOption).once()
+
+        val actual = pureMonitorWaitedProfile.monitorWaitedRequests
+
+        actual should be (expected)
+      }
+    }
+
     describe("#onMonitorWaitedWithData") {
       it("should create a new request if one has not be made yet") {
         val arguments = Seq(mock[JDIRequestArgument])

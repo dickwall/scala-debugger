@@ -19,3 +19,5 @@ addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "0.5.0")
 // Used to provide unified documentation across modules
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.3.3")
 
+// Used for building fat jars
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.1")

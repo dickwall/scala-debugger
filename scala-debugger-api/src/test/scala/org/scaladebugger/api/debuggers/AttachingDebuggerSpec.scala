@@ -299,6 +299,79 @@ class AttachingDebuggerSpec extends FunSpec with Matchers
       }
     }
 
+    describe("#connectedScalaVirtualMachines") {
+      it("should return an empty list if the debugger has not connected") {
+        val attachingDebugger = new TestAttachingDebugger()
+
+        attachingDebugger.connectedScalaVirtualMachines should be (empty)
+      }
+
+      it("should return a list with one virtual machine when connected") {
+        val attachingDebugger = new TestAttachingDebugger()
+        val stubScalaVirtualMachine = stub[TestScalaVirtualMachine]
+
+        // MOCK ===============================================================
+        val mockAttachingConnector = mock[AttachingConnector]
+
+        (mockAttachingConnector.name _).expects()
+          .returning("com.sun.jdi.SocketAttach")
+
+        (mockVirtualMachineManager.attachingConnectors _).expects()
+          .returning(Seq(mockAttachingConnector).asJava)
+
+        (mockAttachingConnector.defaultArguments _).expects().returning(Map(
+          "hostname" -> createConnectorArgumentMock(setter = true),
+          "port" -> createConnectorArgumentMock(setter = true),
+          "timeout" -> createConnectorArgumentMock(setter = true)
+        ).asJava)
+
+        (mockAttachingConnector.attach _).expects(*)
+          .returning(mockVirtualMachine).once()
+        (mockLoopingTaskRunner.start _).expects().once()
+        mockNewScalaVirtualMachineFunc.expects(*, *, *)
+          .returning(stubScalaVirtualMachine).once()
+        // MOCK ===============================================================
+
+        attachingDebugger.start((_) => {})
+
+        attachingDebugger.connectedScalaVirtualMachines should
+          contain (stubScalaVirtualMachine)
+      }
+
+      it("should return an empty list if stopped after a virtual machine has connected") {
+        val attachingDebugger = new TestAttachingDebugger()
+
+        // MOCK ===============================================================
+        val mockAttachingConnector = mock[AttachingConnector]
+
+        (mockAttachingConnector.name _).expects()
+          .returning("com.sun.jdi.SocketAttach")
+
+        (mockVirtualMachineManager.attachingConnectors _).expects()
+          .returning(Seq(mockAttachingConnector).asJava)
+
+        (mockAttachingConnector.defaultArguments _).expects().returning(Map(
+          "hostname" -> createConnectorArgumentMock(setter = true),
+          "port" -> createConnectorArgumentMock(setter = true),
+          "timeout" -> createConnectorArgumentMock(setter = true)
+        ).asJava)
+
+        (mockAttachingConnector.attach _).expects(*)
+          .returning(mockVirtualMachine).once()
+        (mockLoopingTaskRunner.start _).expects().once()
+        mockNewScalaVirtualMachineFunc.expects(*, *, *)
+          .returning(stub[TestScalaVirtualMachine]).once()
+        (mockLoopingTaskRunner.stop _).expects(true).once()
+        (mockVirtualMachine.dispose _).expects().once()
+        // MOCK ===============================================================
+
+        attachingDebugger.start((_) => {})
+        attachingDebugger.stop()
+
+        attachingDebugger.connectedScalaVirtualMachines should be (empty)
+      }
+    }
+
     describe("#process") {
       it("should return Some process if the JVM has been attached") {
         val attachingDebugger = new TestAttachingDebugger(shouldJdiLoad = true)

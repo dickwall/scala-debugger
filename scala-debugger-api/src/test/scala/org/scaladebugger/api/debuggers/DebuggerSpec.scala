@@ -19,6 +19,7 @@ class DebuggerSpec extends FunSpec with Matchers with ParallelTestExecution
       newVirtualMachineFunc: (ScalaVirtualMachine) => T
     ): Unit = ???
     override def newDummyScalaVirtualMachine(): ScalaVirtualMachine = ???
+    override def connectedScalaVirtualMachines: Seq[ScalaVirtualMachine] = ???
   }
 
   describe("Debugger") {

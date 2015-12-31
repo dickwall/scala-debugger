@@ -70,6 +70,10 @@ class ListeningDebugger private[api] (
     java.util.Map[String, Connector.Argument]
   )] = None
 
+  @volatile private var scalaVirtualMachines: collection.mutable.Seq[
+    ScalaVirtualMachine
+  ] = collection.mutable.Seq()
+
   /**
    * Represents the JVM options to feed to remote JVMs whom will connect to
    * this debugger.
@@ -174,6 +178,7 @@ class ListeningDebugger private[api] (
 
     // Mark that we have completely stopped the debugger
     components = None
+    scalaVirtualMachines = collection.mutable.Seq()
   }
 
   /**
@@ -213,6 +218,7 @@ class ListeningDebugger private[api] (
       loopingTaskRunner
     ))
     scalaVirtualMachine.foreach(s => {
+      scalaVirtualMachines :+= s
       getPendingScalaVirtualMachines.foreach(s.processPendingRequests)
       s.initialize(
         startProcessingEvents = startProcessingEvents
@@ -254,4 +260,12 @@ class ListeningDebugger private[api] (
     virtualMachineManager.listeningConnectors().asScala
       .find(_.name() == ConnectorClassString)
   }
+
+  /**
+   * Retrieves the connected virtual machines for the debugger.
+   *
+   * @return The collection of connected virtual machines
+   */
+  override def connectedScalaVirtualMachines: Seq[ScalaVirtualMachine] =
+    scalaVirtualMachines
 }

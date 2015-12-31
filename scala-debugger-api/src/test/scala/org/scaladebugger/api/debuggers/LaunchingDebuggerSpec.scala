@@ -320,6 +320,92 @@ class LaunchingDebuggerSpec extends FunSpec with Matchers
       }
     }
 
+    describe("#connectedScalaVirtualMachines") {
+      it("should return an empty list if the debugger has not connected") {
+        val launchingDebugger = new TestLaunchingDebugger()
+
+        launchingDebugger.connectedScalaVirtualMachines should be (empty)
+      }
+
+      it("should return a list with one virtual machine when connected") {
+        val launchingDebugger = new TestLaunchingDebugger()
+        val stubScalaVirtualMachine = stub[TestScalaVirtualMachine]
+
+        // MOCK ===============================================================
+        val mockLaunchingConnector = mock[LaunchingConnector]
+
+        (mockLaunchingConnector.name _).expects()
+          .returning("com.sun.jdi.CommandLineLaunch")
+
+        (mockVirtualMachineManager.launchingConnectors _).expects()
+          .returning(Seq(mockLaunchingConnector).asJava)
+
+        (mockLaunchingConnector.defaultArguments _).expects().returning(Map(
+          "main" -> createConnectorArgumentMock(setter = true),
+          "options" -> createConnectorArgumentMock(
+            setter = true, getter = Some("")
+          ),
+          "suspend" -> createConnectorArgumentMock(setter = true)
+        ).asJava)
+
+        (mockLaunchingConnector.launch _).expects(*)
+          .returning(mockVirtualMachine).once()
+        (mockLoopingTaskRunner.start _).expects().once()
+
+        mockNewScalaVirtualMachineFunc.expects(*, *, *)
+          .returning(stubScalaVirtualMachine).once()
+        // MOCK ===============================================================
+
+        launchingDebugger.start(_ => {})
+
+        launchingDebugger.connectedScalaVirtualMachines should
+          contain (stubScalaVirtualMachine)
+      }
+
+      it("should return an empty list if stopped after a virtual machine has connected") {
+        val launchingDebugger = new TestLaunchingDebugger()
+        val stubScalaVirtualMachine = stub[TestScalaVirtualMachine]
+
+        // MOCK ===============================================================
+        val mockLaunchingConnector = mock[LaunchingConnector]
+
+        (mockLaunchingConnector.name _).expects()
+          .returning("com.sun.jdi.CommandLineLaunch")
+
+        (mockVirtualMachineManager.launchingConnectors _).expects()
+          .returning(Seq(mockLaunchingConnector).asJava)
+
+        (mockLaunchingConnector.defaultArguments _).expects().returning(Map(
+          "main" -> createConnectorArgumentMock(setter = true),
+          "options" -> createConnectorArgumentMock(
+            setter = true, getter = Some("")
+          ),
+          "suspend" -> createConnectorArgumentMock(setter = true)
+        ).asJava)
+
+        (mockLaunchingConnector.launch _).expects(*)
+          .returning(mockVirtualMachine).once()
+        (mockLoopingTaskRunner.start _).expects().once()
+
+        mockNewScalaVirtualMachineFunc.expects(*, *, *)
+          .returning(stubScalaVirtualMachine).once()
+
+        (mockLoopingTaskRunner.stop _).expects(true).once()
+        val mockProcess = mock[Process]
+        (mockProcess.destroy _).expects().once()
+        (mockVirtualMachine.process _).expects().returning(mockProcess).once()
+
+        // TODO: Re-enable when determine why dispose throws exception
+        //(mockVirtualMachine.dispose _).expects().once()
+        // MOCK ===============================================================
+
+        launchingDebugger.start(_ => {})
+        launchingDebugger.stop()
+
+        launchingDebugger.connectedScalaVirtualMachines should be (empty)
+      }
+    }
+
     describe("#process") {
       it("should return Some process if the JVM has been launched") {
         val launchingDebugger = new TestLaunchingDebugger(shouldJdiLoad = true)

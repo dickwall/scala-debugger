@@ -56,21 +56,22 @@ class AttachingDebugger private[api] (
   private val timeout: Long = 0
 ) extends Debugger with Logging {
   private val ConnectorClassString = "com.sun.jdi.SocketAttach"
-  @volatile private var virtualMachine: Option[VirtualMachine] = None
+  @volatile private var scalaVirtualMachine: Option[ScalaVirtualMachine] = None
 
   /**
    * Indicates whether or not the debugger is running.
    *
    * @return True if it is running, otherwise false
    */
-  override def isRunning: Boolean = virtualMachine.nonEmpty
+  override def isRunning: Boolean = scalaVirtualMachine.nonEmpty
 
   /**
    * Retrieves the process of the attached JVM.
    *
    * @return The Java process representing the attached JVM
    */
-  def process: Option[Process] = virtualMachine.map(_.process())
+  def process: Option[Process] =
+    scalaVirtualMachine.map(_.underlyingVirtualMachine).map(_.process())
 
   /**
    * Starts the debugger, resulting in attaching a new process to connect to.
@@ -109,23 +110,24 @@ class AttachingDebugger private[api] (
     logger.info("Attaching hostname: " + _hostname)
     logger.info("Attaching port: " + _port)
     logger.info("Attaching timeout: " + _timeout)
-    virtualMachine = Some(connector.attach(arguments))
+    val virtualMachine = connector.attach(arguments)
 
     logger.debug("Starting looping task runner")
     loopingTaskRunner.start()
 
-    val scalaVirtualMachine = newScalaVirtualMachine(
-      virtualMachine.get,
+    scalaVirtualMachine = Some(newScalaVirtualMachine(
+      virtualMachine,
       profileManager,
       loopingTaskRunner
-    )
+    ))
+
     getPendingScalaVirtualMachines.foreach(
-      scalaVirtualMachine.processPendingRequests
+      scalaVirtualMachine.get.processPendingRequests
     )
-    scalaVirtualMachine.initialize(
+    scalaVirtualMachine.get.initialize(
       startProcessingEvents = startProcessingEvents
     )
-    newVirtualMachineFunc(scalaVirtualMachine)
+    newVirtualMachineFunc(scalaVirtualMachine.get)
   }
 
   /**
@@ -138,10 +140,10 @@ class AttachingDebugger private[api] (
     loopingTaskRunner.stop()
 
     // Free up the connection to the JVM
-    virtualMachine.get.dispose()
+    scalaVirtualMachine.map(_.underlyingVirtualMachine).foreach(_.dispose())
 
     // Wipe our reference to the old virtual machine
-    virtualMachine = None
+    scalaVirtualMachine = None
   }
 
   /**
@@ -175,4 +177,12 @@ class AttachingDebugger private[api] (
     virtualMachineManager.attachingConnectors().asScala
       .find(_.name() == ConnectorClassString)
   }
+
+  /**
+   * Retrieves the connected virtual machines for the debugger.
+   *
+   * @return The collection of connected virtual machines
+   */
+  override def connectedScalaVirtualMachines: Seq[ScalaVirtualMachine] =
+    scalaVirtualMachine.toSeq
 }

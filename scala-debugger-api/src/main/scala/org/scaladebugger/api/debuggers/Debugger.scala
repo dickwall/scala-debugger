@@ -81,6 +81,13 @@ trait Debugger {
   def isRunning: Boolean
 
   /**
+   * Retrieves the connected virtual machines for the debugger.
+   *
+   * @return The collection of connected virtual machines
+   */
+  def connectedScalaVirtualMachines: Seq[ScalaVirtualMachine]
+
+  /**
    * Creates a new dummy Scala virtual machine instance that can be used to
    * prepare pending requests to apply to the Scala virtual machines generated
    * by the debugger once it starts.

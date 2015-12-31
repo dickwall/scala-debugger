@@ -65,21 +65,22 @@ class LaunchingDebugger private[api] (
   private val suspend: Boolean = true
 ) extends Debugger with Logging {
   private val ConnectorClassString = "com.sun.jdi.CommandLineLaunch"
-  @volatile private var virtualMachine: Option[VirtualMachine] = None
+  @volatile private var scalaVirtualMachine: Option[ScalaVirtualMachine] = None
 
   /**
    * Indicates whether or not the debugger is running.
    *
    * @return True if it is running, otherwise false
    */
-  override def isRunning: Boolean = virtualMachine.nonEmpty
+  override def isRunning: Boolean = scalaVirtualMachine.nonEmpty
 
   /**
    * Retrieves the process of the launched JVM.
    *
    * @return The Java process representing the launched JVM
    */
-  def process: Option[Process] = virtualMachine.map(_.process())
+  def process: Option[Process] =
+    scalaVirtualMachine.map(_.underlyingVirtualMachine).map(_.process())
 
   /**
    * Starts the debugger, resulting in launching a new process to connect to.
@@ -112,23 +113,24 @@ class LaunchingDebugger private[api] (
     logger.info("Launching main: " + main)
     logger.info("Launching options: " + options)
     logger.info("Launching suspend: " + suspend)
-    virtualMachine = Some(connector.launch(arguments))
+    val virtualMachine = connector.launch(arguments)
 
     logger.debug("Starting looping task runner")
     loopingTaskRunner.start()
 
-    val scalaVirtualMachine = newScalaVirtualMachine(
-      virtualMachine.get,
+    scalaVirtualMachine = Some(newScalaVirtualMachine(
+      virtualMachine,
       profileManager,
       loopingTaskRunner
-    )
+    ))
+
     getPendingScalaVirtualMachines.foreach(
-      scalaVirtualMachine.processPendingRequests
+      scalaVirtualMachine.get.processPendingRequests
     )
-    scalaVirtualMachine.initialize(
+    scalaVirtualMachine.get.initialize(
       startProcessingEvents = startProcessingEvents
     )
-    newVirtualMachineFunc(scalaVirtualMachine)
+    newVirtualMachineFunc(scalaVirtualMachine.get)
   }
 
   /**
@@ -147,10 +149,11 @@ class LaunchingDebugger private[api] (
     // Kill the process associated with the local virtual machine
     logger.info("Shutting down process: " +
       (className +: commandLineArguments).mkString(" "))
-    virtualMachine.get.process().destroy()
+    scalaVirtualMachine.map(_.underlyingVirtualMachine)
+      .foreach(_.process().destroy())
 
     // Wipe our reference to the old virtual machine
-    virtualMachine = None
+    scalaVirtualMachine = None
   }
 
   /**
@@ -184,4 +187,12 @@ class LaunchingDebugger private[api] (
     virtualMachineManager.launchingConnectors().asScala
       .find(_.name() == ConnectorClassString)
   }
+
+  /**
+   * Retrieves the connected virtual machines for the debugger.
+   *
+   * @return The collection of connected virtual machines
+   */
+  override def connectedScalaVirtualMachines: Seq[ScalaVirtualMachine] =
+    scalaVirtualMachine.toSeq
 }

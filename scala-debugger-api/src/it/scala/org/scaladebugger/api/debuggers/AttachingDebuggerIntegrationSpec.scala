@@ -9,7 +9,7 @@ import org.scalatest.time.{Milliseconds, Seconds, Span}
 import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 import test.{TestUtilities, VirtualMachineFixtures}
 
-class AttachingDebuggerIntegrationSpec  extends FunSpec with Matchers
+class AttachingDebuggerIntegrationSpec extends FunSpec with Matchers
   with BeforeAndAfter with VirtualMachineFixtures
   with TestUtilities with Eventually
 {

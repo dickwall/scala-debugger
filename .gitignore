@@ -8,4 +8,5 @@ target/
 **.iml
 site/
 .DS_Store
+**.log
 

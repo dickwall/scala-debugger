@@ -88,6 +88,6 @@ object Common {
       else
         Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     }
-  )
+  ) ++ Macros.pluginSettings
 }
 

@@ -1,5 +1,6 @@
 package org.scaladebugger.api.utils
 
+import java.io.ByteArrayInputStream
 import java.net.{URL, URLClassLoader}
 
 import org.scalamock.scalatest.MockFactory
@@ -130,6 +131,32 @@ class JDIToolsSpec extends FunSpec with Matchers with ParallelTestExecution
         jdiTools.spawn(className, port)
       }
 
+      it("should set the command line arguments using the provided arguments") {
+        val expected = Seq("-arg", "3", "--some-arg", "--other-arg=3")
+
+        val stubJdiProcess = stub[JDIProcess]
+        val jdiTools = new JDITools {
+          override protected def newJDIProcess(): JDIProcess = stubJdiProcess
+        }
+
+        (stubJdiProcess.setArguments _).when(expected).once()
+
+        jdiTools.spawn("", 0, args = expected)
+      }
+
+      it("should set the JVM options using the provided options") {
+        val expected = Seq("-Dsomeproperty=3")
+
+        val stubJdiProcess = stub[JDIProcess]
+        val jdiTools = new JDITools {
+          override protected def newJDIProcess(): JDIProcess = stubJdiProcess
+        }
+
+        (stubJdiProcess.setJvmOptions _).when(expected).once()
+
+        jdiTools.spawn("", 0, options = expected)
+      }
+
       it("should start the process") {
         val className = "some.class.name"
         val port = 9999
@@ -142,6 +169,55 @@ class JDIToolsSpec extends FunSpec with Matchers with ParallelTestExecution
         (stubJdiProcess.start _).when().once()
 
         jdiTools.spawn(className, port)
+      }
+    }
+
+    describe("#javaProcesses") {
+      it("should parse empty input as an empty list") {
+        val expected = Nil
+
+        val input = ""
+
+        val stubProcess = stub[Process]
+        val jdiTools = new JDITools {
+          override protected def spawnJavaProcessRetrieval(): Process = stubProcess
+        }
+
+        val stringStream = new ByteArrayInputStream(input.getBytes("UTF-8"))
+        (stubProcess.getInputStream _).when().returns(stringStream).once()
+
+        val actual = jdiTools.javaProcesses()
+
+        actual should be (expected)
+      }
+
+      it("should parse each line of input from a list as a Java process") {
+        val expected = Seq(
+          JavaProcess(0, "a", JVMOptions.Blank),
+          JavaProcess(1, "b", JVMOptions.Blank)
+        )
+
+        val input = Seq("line1", "line2").mkString("\n")
+
+        val stubProcess = stub[Process]
+        val jdiTools = new JDITools {
+          override protected def spawnJavaProcessRetrieval(): Process = stubProcess
+        }
+
+        val stringStream = new ByteArrayInputStream(input.getBytes("UTF-8"))
+        (stubProcess.getInputStream _).when().returns(stringStream).once()
+
+        val actual = jdiTools.javaProcesses((() => {
+          var current = expected
+
+          (s: String) => {
+            val next = current.headOption
+            current = current.takeRight(current.length - 1)
+            next
+          }
+        })())
+
+        actual should be (expected)
       }
     }
 

@@ -106,14 +106,14 @@ class StackFrameWrapperSpec extends FunSpec with Matchers with MockFactory
         actual should be (expected)
       }
 
-      it("should not include arguments in its variables") {
+      it("should include arguments and non-arguments in its variables") {
         val localVariablesAndValues = Map[LocalVariable, Value](
           createLocalVariableStub("one") -> createPrimitiveValueStub(3),
           createLocalVariableStub("two", isArgument = true) ->
             createPrimitiveValueStub(false),
           createLocalVariableStub("three") -> createPrimitiveValueStub(0.5)
         )
-        val expected = localVariablesAndValues.filterNot(_._1.isArgument)
+        val expected = localVariablesAndValues
 
         val stackFrame = createStackFrameStub(
           visibleVariablesWithValues = Some(localVariablesAndValues.toSeq),
@@ -135,8 +135,7 @@ class StackFrameWrapperSpec extends FunSpec with Matchers with MockFactory
         val localVariables = Map[LocalVariable, Value](
           createLocalVariableStub("four") -> null
         )
-        val expected =
-          localVariablesAndValues.filterNot(_._1.isArgument) ++ localVariables
+        val expected = localVariablesAndValues ++ localVariables
 
         val stackFrame = createStackFrameStub(
           visibleVariablesWithValues = Some(localVariablesAndValues.toSeq),
@@ -161,6 +160,158 @@ class StackFrameWrapperSpec extends FunSpec with Matchers with MockFactory
         )
 
         val actual = new StackFrameWrapper(stackFrame).localVisibleVariableMap()
+
+        actual should be (expected)
+      }
+    }
+
+    describe("#localArgumentMap") {
+      it("should return an empty map if unable to retrieve variables") {
+        val expected = Map[LocalVariable, Value]()
+
+        // Throws exceptions if all visible variables marked none in our stub
+        val stackFrame = createStackFrameStub(
+          visibleVariablesWithValues = None,
+          visibleVariablesWithoutValues = None
+        )
+
+        val actual = new StackFrameWrapper(stackFrame).localArgumentMap()
+
+        actual should be (expected)
+      }
+
+      it("should only include arguments in its variables") {
+        val localVariablesAndValues = Map[LocalVariable, Value](
+          createLocalVariableStub("one") -> createPrimitiveValueStub(3),
+          createLocalVariableStub("two", isArgument = true) ->
+            createPrimitiveValueStub(false),
+          createLocalVariableStub("three") -> createPrimitiveValueStub(0.5)
+        )
+        val expected = localVariablesAndValues.filter(_._1.isArgument)
+
+        val stackFrame = createStackFrameStub(
+          visibleVariablesWithValues = Some(localVariablesAndValues.toSeq),
+          visibleVariablesWithoutValues = None
+        )
+
+        val actual = new StackFrameWrapper(stackFrame).localArgumentMap()
+
+        actual should be (expected)
+      }
+
+      it("should fill in any missing values with null") {
+        val localVariablesAndValues = Map[LocalVariable, Value](
+          createLocalVariableStub("one") -> createPrimitiveValueStub(3),
+          createLocalVariableStub("two", isArgument = true) ->
+            createPrimitiveValueStub(false),
+          createLocalVariableStub("three") -> createPrimitiveValueStub(0.5)
+        )
+        val localVariables = Map[LocalVariable, Value](
+          createLocalVariableStub("four", isArgument = true) -> null
+        )
+        val expected =
+          localVariablesAndValues.filter(_._1.isArgument) ++ localVariables
+
+        val stackFrame = createStackFrameStub(
+          visibleVariablesWithValues = Some(localVariablesAndValues.toSeq),
+          visibleVariablesWithoutValues = Some(localVariables.keys.toSeq)
+        )
+
+        val actual = new StackFrameWrapper(stackFrame).localArgumentMap()
+
+        actual should be (expected)
+      }
+
+      it("should return a map of variable -> value from local variables") {
+        val localVariablesAndValues = Map[LocalVariable, Value](
+          createLocalVariableStub("one", isArgument = true) ->
+            createPrimitiveValueStub(3),
+          createLocalVariableStub("two", isArgument = true) ->
+            createPrimitiveValueStub(0.5)
+        )
+        val expected = localVariablesAndValues
+
+        val stackFrame = createStackFrameStub(
+          visibleVariablesWithValues = Some(localVariablesAndValues.toSeq),
+          visibleVariablesWithoutValues = None
+        )
+
+        val actual = new StackFrameWrapper(stackFrame).localArgumentMap()
+
+        actual should be (expected)
+      }
+    }
+
+    describe("#localNonArgumentMap") {
+      it("should return an empty map if unable to retrieve variables") {
+        val expected = Map[LocalVariable, Value]()
+
+        // Throws exceptions if all visible variables marked none in our stub
+        val stackFrame = createStackFrameStub(
+          visibleVariablesWithValues = None,
+          visibleVariablesWithoutValues = None
+        )
+
+        val actual = new StackFrameWrapper(stackFrame).localNonArgumentMap()
+
+        actual should be (expected)
+      }
+
+      it("should not include arguments in its variables") {
+        val localVariablesAndValues = Map[LocalVariable, Value](
+          createLocalVariableStub("one") -> createPrimitiveValueStub(3),
+          createLocalVariableStub("two", isArgument = true) ->
+            createPrimitiveValueStub(false),
+          createLocalVariableStub("three") -> createPrimitiveValueStub(0.5)
+        )
+        val expected = localVariablesAndValues.filterNot(_._1.isArgument)
+
+        val stackFrame = createStackFrameStub(
+          visibleVariablesWithValues = Some(localVariablesAndValues.toSeq),
+          visibleVariablesWithoutValues = None
+        )
+
+        val actual = new StackFrameWrapper(stackFrame).localNonArgumentMap()
+
+        actual should be (expected)
+      }
+
+      it("should fill in any missing values with null") {
+        val localVariablesAndValues = Map[LocalVariable, Value](
+          createLocalVariableStub("one") -> createPrimitiveValueStub(3),
+          createLocalVariableStub("two", isArgument = true) ->
+            createPrimitiveValueStub(false),
+          createLocalVariableStub("three") -> createPrimitiveValueStub(0.5)
+        )
+        val localVariables = Map[LocalVariable, Value](
+          createLocalVariableStub("four") -> null
+        )
+        val expected =
+          localVariablesAndValues.filterNot(_._1.isArgument) ++ localVariables
+
+        val stackFrame = createStackFrameStub(
+          visibleVariablesWithValues = Some(localVariablesAndValues.toSeq),
+          visibleVariablesWithoutValues = Some(localVariables.keys.toSeq)
+        )
+
+        val actual = new StackFrameWrapper(stackFrame).localNonArgumentMap()
+
+        actual should be (expected)
+      }
+
+      it("should return a map of variable -> value from local variables") {
+        val localVariablesAndValues = Map[LocalVariable, Value](
+          createLocalVariableStub("one") -> createPrimitiveValueStub(3),
+          createLocalVariableStub("two") -> createPrimitiveValueStub(0.5)
+        )
+        val expected = localVariablesAndValues
+
+        val stackFrame = createStackFrameStub(
+          visibleVariablesWithValues = Some(localVariablesAndValues.toSeq),
+          visibleVariablesWithoutValues = None
+        )
+
+        val actual = new StackFrameWrapper(stackFrame).localNonArgumentMap()
 
         actual should be (expected)
       }

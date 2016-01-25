@@ -336,46 +336,6 @@ class PendingExceptionSupportSpec extends FunSpec with Matchers
       }
     }
 
-    describe("#removeCatchallExceptionRequest") {
-      it("should return true if the exception was successfully deleted") {
-        val expected = true
-
-        (mockExceptionManager.removeCatchallExceptionRequest _).expects()
-          .returning(true).once()
-
-        // Return "no removals" for pending exceptions (performed by standard
-        // removeExceptionRequest call)
-        (mockPendingActionManager.removePendingActions _).expects(*)
-          .returning(Nil).once()
-
-        val actual = pendingExceptionSupport.removeCatchallExceptionRequest()
-
-        actual should be (expected)
-      }
-
-      it("should return true if the pending exception was successfully deleted") {
-        val expected = true
-
-        // Return removals for pending exceptions
-        val pendingRemovalReturn = Seq(
-          ActionInfo(
-            TestRequestId,
-            ExceptionRequestInfo(null, TestRequestId, true, false, Nil),
-            () => {}
-          )
-        )
-        (mockExceptionManager.removeCatchallExceptionRequest _).expects()
-          .returning(false).once()
-        (mockPendingActionManager.removePendingActions _)
-          .expects(*)
-          .returning(pendingRemovalReturn).once()
-
-        val actual = pendingExceptionSupport.removeCatchallExceptionRequest()
-
-        actual should be (expected)
-      }
-    }
-
     describe("#removeExceptionRequest") {
       it("should return true if the exception was successfully deleted") {
         val expected = true

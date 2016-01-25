@@ -32,46 +32,6 @@ class DummyExceptionManagerSpec extends FunSpec with Matchers with MockFactory
       }
     }
 
-    describe("#hasCatchallExceptionRequest") {
-      it("should return false") {
-        val expected = false
-
-        val actual = exceptionManager.hasCatchallExceptionRequest
-
-        actual should be (expected)
-      }
-    }
-
-    describe("#getCatchallExceptionRequestId") {
-      it("should return None") {
-        val expected = None
-
-        val actual = exceptionManager.getCatchallExceptionRequestId
-
-        actual should be (expected)
-      }
-    }
-
-    describe("#getCatchallExceptionRequest") {
-      it("should return None") {
-        val expected = None
-
-        val actual = exceptionManager.getCatchallExceptionRequest
-
-        actual should be (expected)
-      }
-    }
-
-    describe("#removeCatchallExceptionRequest") {
-      it("should return false") {
-        val expected = false
-
-        val actual = exceptionManager.removeCatchallExceptionRequest()
-
-        actual should be (expected)
-      }
-    }
-
     describe("#exceptionRequestListById") {
       it("should return an empty list") {
         exceptionManager.exceptionRequestListById should be (empty)

@@ -117,103 +117,6 @@ class StandardExceptionManagerSpec extends FunSpec with Matchers with MockFactor
       }
     }
 
-    describe("#hasCatchallExceptionRequest") {
-      it("should return true if the catchall has been set") {
-        val expected = true
-
-        (mockEventRequestManager.createExceptionRequest _)
-          .expects(*, *, *)
-          .returning(stub[ExceptionRequest]).once()
-
-        exceptionManager.createCatchallExceptionRequest(true, true) should
-          be (Success(TestRequestId))
-
-        val actual = exceptionManager.hasCatchallExceptionRequest
-        actual should be (expected)
-      }
-
-      it("should return false if the catchall has not been set") {
-        val expected = false
-
-        val actual = exceptionManager.hasCatchallExceptionRequest
-        actual should be (expected)
-      }
-    }
-
-    describe("#getCatchallExceptionRequestId") {
-      it("should return Some(id) if the catchall has been set") {
-        val expected = Some(TestRequestId)
-
-        (mockEventRequestManager.createExceptionRequest _)
-          .expects(*, *, *)
-          .returning(stub[ExceptionRequest]).once()
-
-        exceptionManager.createCatchallExceptionRequest(true, true) should
-          be (Success(expected.get))
-
-        val actual = exceptionManager.getCatchallExceptionRequestId
-        actual should be (expected)
-      }
-
-      it("should return None if the catchall has not been set") {
-        val expected = None
-
-        val actual = exceptionManager.getCatchallExceptionRequestId
-        actual should be (expected)
-      }
-    }
-
-    describe("#getCatchallExceptionRequest") {
-      it("should return Some(ExceptionRequest) if the catchall has been set") {
-        val expected = Some(stub[ExceptionRequest])
-
-        (mockEventRequestManager.createExceptionRequest _)
-          .expects(*, *, *)
-          .returning(expected.get).once()
-
-        exceptionManager.createCatchallExceptionRequest(true, true) should
-          be (Success(TestRequestId))
-
-        val actual = exceptionManager.getCatchallExceptionRequest
-        actual should be (expected)
-      }
-
-      it("should return None if the catchall has not been set") {
-        val expected = None
-
-        val actual = exceptionManager.getCatchallExceptionRequest
-        actual should be (expected)
-      }
-    }
-
-    describe("#removeCatchallExceptionRequest") {
-      it("should return true if the exception request was removed") {
-        val expected = true
-
-        val stubExceptionRequest = stub[ExceptionRequest]
-
-        (mockEventRequestManager.createExceptionRequest _)
-          .expects(*, *, *)
-          .returning(stubExceptionRequest).once()
-
-        exceptionManager.createCatchallExceptionRequest(true, true) should
-          be (Success(TestRequestId))
-
-        (mockEventRequestManager.deleteEventRequest _)
-          .expects(stubExceptionRequest).once()
-
-        val actual = exceptionManager.removeCatchallExceptionRequest()
-        actual should be (expected)
-      }
-
-      it("should return false if the exception request was not removed") {
-        val expected = false
-
-        val actual = exceptionManager.removeCatchallExceptionRequest()
-        actual should be (expected)
-      }
-    }
-
     describe("#exceptionRequestListById") {
       it("should contain all exception requests in the form of (class, method) stored in the manager") {
         val testNotifyCaught = true
@@ -491,8 +394,8 @@ class StandardExceptionManagerSpec extends FunSpec with Matchers with MockFactor
           testNotifyUncaught
         )
 
-        (mockEventRequestManager.deleteEventRequest _)
-          .expects(stubRequest).once()
+        (mockEventRequestManager.deleteEventRequests _)
+          .expects(Seq(stubRequest).asJava).once()
 
         val actual = exceptionManager.removeExceptionRequestWithId(TestRequestId)
         actual should be (expected)

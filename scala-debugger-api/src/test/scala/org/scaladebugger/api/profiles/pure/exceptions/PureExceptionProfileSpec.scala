@@ -589,10 +589,9 @@ class PureExceptionProfileSpec extends FunSpec with Matchers
         inSequence {
           // Memoized request function first checks to make sure the cache
           // has not been invalidated underneath (first call will always be
-          // false since we have never created the request)
-          (mockExceptionManager.hasCatchallExceptionRequest _)
-            .expects()
-            .returning(false).once()
+          // empty since we have never created the request)
+          (mockExceptionManager.exceptionRequestList _).expects()
+            .returning(Nil).once()
 
           // NOTE: Expect the request to be created with a unique id
           (mockExceptionManager.createCatchallExceptionRequestWithId _).expects(
@@ -631,10 +630,9 @@ class PureExceptionProfileSpec extends FunSpec with Matchers
         inSequence {
           // Memoized request function first checks to make sure the cache
           // has not been invalidated underneath (first call will always be
-          // false since we have never created the request)
-          (mockExceptionManager.hasCatchallExceptionRequest _)
-            .expects()
-            .returning(false).once()
+          // empty since we have never created the request)
+          (mockExceptionManager.exceptionRequestList _).expects()
+            .returning(Nil).once()
 
           // NOTE: Expect the request to be created with a unique id
           (mockExceptionManager.createCatchallExceptionRequestWithId _).expects(
@@ -674,10 +672,9 @@ class PureExceptionProfileSpec extends FunSpec with Matchers
 
           // Memoized request function first checks to make sure the cache
           // has not been invalidated underneath (first call will always be
-          // false since we have never created the request)
-          (mockExceptionManager.hasCatchallExceptionRequest _)
-            .expects()
-            .returning(false).once()
+          // empty since we have never created the request)
+          (mockExceptionManager.exceptionRequestList _).expects()
+            .returning(Nil).once()
 
           // NOTE: Expect the request to be created with a unique id
           (mockExceptionManager.createCatchallExceptionRequestWithId _).expects(
@@ -709,11 +706,10 @@ class PureExceptionProfileSpec extends FunSpec with Matchers
           val uniqueIdPropertyFilter =
             UniqueIdPropertyFilter(id = TestRequestId + "other")
 
-          // Return false this time to indicate that the exception request
+          // Return empty this time to indicate that the exception request
           // was removed some time between the two calls
-          (mockExceptionManager.hasCatchallExceptionRequest _)
-            .expects()
-            .returning(false).once()
+          (mockExceptionManager.exceptionRequestList _).expects()
+            .returning(Nil).once()
 
           // NOTE: Expect the request to be created with a unique id
           (mockExceptionManager.createCatchallExceptionRequestWithId _).expects(
@@ -753,10 +749,9 @@ class PureExceptionProfileSpec extends FunSpec with Matchers
 
           // Memoized request function first checks to make sure the cache
           // has not been invalidated underneath (first call will always be
-          // false since we have never created the request)
-          (mockExceptionManager.hasCatchallExceptionRequest _)
-            .expects()
-            .returning(false).once()
+          // empty since we have never created the request)
+          (mockExceptionManager.exceptionRequestList _).expects()
+            .returning(Nil).once()
 
           // NOTE: Expect the request to be created with a unique id
           (mockExceptionManager.createCatchallExceptionRequestWithId _).expects(
@@ -787,10 +782,15 @@ class PureExceptionProfileSpec extends FunSpec with Matchers
           val uniqueIdPropertyFilter =
             UniqueIdPropertyFilter(id = TestRequestId)
 
-          // Return true to indicate that we do still have the request
-          (mockExceptionManager.hasCatchallExceptionRequest _)
-            .expects()
-            .returning(true).once()
+          // Return matching info to indicate that we do still have the request
+          (mockExceptionManager.exceptionRequestList _).expects()
+            .returning(Seq(ExceptionRequestInfo(
+              requestId = TestRequestId,
+              className = ExceptionRequestInfo.DefaultCatchallExceptionName,
+              notifyCaught = notifyCaught,
+              notifyUncaught = notifyUncaught,
+              extraArguments = arguments
+            ))).once()
 
           (mockEventManager.addEventDataStream _)
             .expects(ExceptionEventType, Seq(uniqueIdPropertyFilter))
@@ -825,10 +825,17 @@ class PureExceptionProfileSpec extends FunSpec with Matchers
             // Memoized request function first checks to make sure the cache
             // has not been invalidated underneath (first call will always be
             // empty since we have never created the request)
-            (mockExceptionManager.hasCatchallExceptionRequest _).expects()
-              .returning(false).once()
-            (mockExceptionManager.hasCatchallExceptionRequest _).expects()
-              .returning(true).once()
+            (mockExceptionManager.exceptionRequestList _).expects()
+              .returning(Nil).once()
+            // Return matching info to indicate that we do still have the request
+            (mockExceptionManager.exceptionRequestList _).expects()
+              .returning(Seq(ExceptionRequestInfo(
+                requestId = TestRequestId,
+                className = ExceptionRequestInfo.DefaultCatchallExceptionName,
+                notifyCaught = notifyCaught,
+                notifyUncaught = notifyUncaught,
+                extraArguments = uniqueIdProperty +: arguments
+              ))).once()
 
             // NOTE: Expect the request to be created with a unique id
             (mockExceptionManager.createCatchallExceptionRequestWithId _)
@@ -893,10 +900,17 @@ class PureExceptionProfileSpec extends FunSpec with Matchers
             // Memoized request function first checks to make sure the cache
             // has not been invalidated underneath (first call will always be
             // empty since we have never created the request)
-            (mockExceptionManager.hasCatchallExceptionRequest _).expects()
-              .returning(false).once()
-            (mockExceptionManager.hasCatchallExceptionRequest _).expects()
-              .returning(true).once()
+            (mockExceptionManager.exceptionRequestList _).expects()
+              .returning(Nil).once()
+            // Return matching info to indicate that we do still have the request
+            (mockExceptionManager.exceptionRequestList _).expects()
+              .returning(Seq(ExceptionRequestInfo(
+                requestId = TestRequestId,
+                className = ExceptionRequestInfo.DefaultCatchallExceptionName,
+                notifyCaught = notifyCaught,
+                notifyUncaught = notifyUncaught,
+                extraArguments = uniqueIdProperty +: arguments
+              ))).once()
 
             // NOTE: Expect the request to be created with a unique id
             (mockExceptionManager.createCatchallExceptionRequestWithId _)

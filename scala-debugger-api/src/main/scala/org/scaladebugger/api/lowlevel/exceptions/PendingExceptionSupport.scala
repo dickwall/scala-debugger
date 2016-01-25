@@ -162,24 +162,6 @@ trait PendingExceptionSupport extends PendingExceptionSupportLike {
   }
 
   /**
-   * Removes the exception request used to catch all exceptions.
-   *
-   * @return True if the exception request was removed (if it existed),
-   *         otherwise false
-   */
-  abstract override def removeCatchallExceptionRequest(): Boolean = {
-    val result = super.removeCatchallExceptionRequest()
-
-    // Null is the class name for catchall exception requests
-    val pendingResult = pendingActionManager.removePendingActions(a =>
-      a.data.className == null
-    )
-
-    // True if we removed a real exception or any pending exceptions
-    result || pendingResult.nonEmpty
-  }
-
-  /**
    * Removes the specified exception requests with the matching exception
    * class name.
    *

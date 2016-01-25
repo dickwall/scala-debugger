@@ -11,6 +11,22 @@ class ThreadReferenceWrapper(private val _threadReference: ThreadReference) {
   require(_threadReference != null, "Thread reference cannot be null!")
 
   /**
+   * Returns a string representing the status of the thread.
+   *
+   * @return The status as a string
+   */
+  def statusString: String = _threadReference.status() match {
+    case ThreadReference.THREAD_STATUS_MONITOR      => "Monitoring"
+    case ThreadReference.THREAD_STATUS_NOT_STARTED  => "Not Started"
+    case ThreadReference.THREAD_STATUS_RUNNING      => "Running"
+    case ThreadReference.THREAD_STATUS_SLEEPING     => "Sleeping"
+    case ThreadReference.THREAD_STATUS_UNKNOWN      => "Unknown"
+    case ThreadReference.THREAD_STATUS_WAIT         => "Waiting"
+    case ThreadReference.THREAD_STATUS_ZOMBIE       => "Zombie"
+    case x                                          => s"Invalid status id $x"
+  }
+
+  /**
    * Indicates whether or not the status of this thread is known.
    *
    * @return False if the status is known, otherwise true

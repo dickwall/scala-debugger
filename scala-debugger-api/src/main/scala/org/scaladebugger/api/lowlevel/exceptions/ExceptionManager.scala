@@ -71,35 +71,6 @@ trait ExceptionManager {
   )
 
   /**
-   * Retrieves the id of the exception request used to catch all exceptions.
-   *
-   * @return Some id if the catchall has been set, otherwise None
-   */
-  def getCatchallExceptionRequestId: Option[String]
-
-  /**
-   * Determines if the exception request to catch all exceptions has been set.
-   *
-   * @return True if set, otherwise false
-   */
-  def hasCatchallExceptionRequest: Boolean
-
-  /**
-   * Retrieves the exception request used to catch all exceptions.
-   *
-   * @return Some exception request if the catchall has been set, otherwise None
-   */
-  def getCatchallExceptionRequest: Option[ExceptionRequest]
-
-  /**
-   * Removes the exception request used to catch all exceptions.
-   *
-   * @return True if the exception request was removed (if it existed),
-   *         otherwise false
-   */
-  def removeCatchallExceptionRequest(): Boolean
-
-  /**
    * Creates a new exception request for the specified exception class.
    *
    * @note Any exception and its subclass will be watched.

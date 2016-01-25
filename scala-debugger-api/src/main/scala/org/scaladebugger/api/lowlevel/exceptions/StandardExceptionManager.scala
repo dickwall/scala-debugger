@@ -9,14 +9,6 @@ import scala.collection.JavaConverters._
 import org.scaladebugger.api.lowlevel.requests.Implicits._
 
 import scala.util.{Failure, Try}
-import StandardExceptionManager._
-
-/**
- * Contains constants for the ExceptionManager.
- */
-object StandardExceptionManager {
-  val DefaultCatchallExceptionName = "<CATCHALL>"
-}
 
 /**
  * Represents the manager for exception requests.
@@ -31,8 +23,6 @@ class StandardExceptionManager(
 ) extends ExceptionManager with Logging {
   private val exceptionRequests =
     new MultiMap[ExceptionRequestInfo, Seq[ExceptionRequest]]
-
-  @volatile private var catchallExceptionRequestId: Option[String] = None
 
   /**
    * Retrieves the list of exception requests contained by this manager.
@@ -80,12 +70,11 @@ class StandardExceptionManager(
     ))
 
     if (request.isSuccess) {
-      catchallExceptionRequestId = Some(requestId)
       exceptionRequests.putWithId(
         requestId,
         ExceptionRequestInfo(
           requestId = requestId,
-          className = DefaultCatchallExceptionName,
+          className = ExceptionRequestInfo.DefaultCatchallExceptionName,
           notifyCaught = notifyCaught,
           notifyUncaught = notifyUncaught,
           extraArguments = extraArguments
@@ -96,53 +85,6 @@ class StandardExceptionManager(
 
     // If no exception was thrown, assume that we succeeded
     request.map(_ => requestId)
-  }
-
-  /**
-   * Retrieves the id of the exception request used to catch all exceptions.
-   *
-   * @return Some id if the catchall has been set, otherwise None
-   */
-  override def getCatchallExceptionRequestId: Option[String] = {
-    catchallExceptionRequestId
-  }
-
-  /**
-   * Determines if the exception request to catch all exceptions has been set.
-   *
-   * @return True if set, otherwise false
-   */
-  override def hasCatchallExceptionRequest: Boolean =
-    catchallExceptionRequestId.nonEmpty
-
-  /**
-   * Retrieves the exception request used to catch all exceptions.
-   *
-   * @return Some exception request if the catchall has been set, otherwise None
-   */
-  override def getCatchallExceptionRequest: Option[ExceptionRequest] = {
-    catchallExceptionRequestId
-      .flatMap(getExceptionRequestWithId)
-      .flatMap(_.headOption)
-  }
-
-  /**
-   * Removes the exception request used to catch all exceptions.
-   *
-   * @return True if the exception request was removed (if it existed),
-   *         otherwise false
-   */
-  override def removeCatchallExceptionRequest(): Boolean = {
-    catchallExceptionRequestId.synchronized {
-      getCatchallExceptionRequest match {
-        case Some(r) =>
-          eventRequestManager.deleteEventRequest(r)
-          catchallExceptionRequestId = None
-          true
-        case None =>
-          false
-      }
-    }
   }
 
   /**
@@ -285,19 +227,10 @@ class StandardExceptionManager(
    *         otherwise false
    */
   override def removeExceptionRequestWithId(requestId: String): Boolean = {
-    val isCatchallId = getCatchallExceptionRequestId.exists(_ == requestId)
+    val requests = exceptionRequests.removeWithId(requestId)
 
-    // Special case for removing catchall exception request
-    if (isCatchallId) {
-      removeCatchallExceptionRequest()
+    requests.map(_.asJava).foreach(eventRequestManager.deleteEventRequests)
 
-    // Normal case for removing a standard exception request
-    } else {
-      val requests = exceptionRequests.removeWithId(requestId)
-
-      requests.map(_.asJava).foreach(eventRequestManager.deleteEventRequests)
-
-      requests.nonEmpty
-    }
+    requests.nonEmpty
   }
 }

@@ -5,12 +5,15 @@ object Macros {
   /** Version used for paradise and quasiquotes. */
   val macroVersion = "2.1.0"
 
-  /** Macro-specific project settings. */
-  val settings = Seq(
+  /** Compiler plugin settings related to macros. */
+  val pluginSettings = Seq(
     addCompilerPlugin(
       "org.scalamacros" % "paradise" % macroVersion cross CrossVersion.full
-    ),
+    )
+  )
 
+  /** Macro-specific project settings. */
+  val settings = pluginSettings ++ Seq(
     libraryDependencies <+= scalaVersion(
       "org.scala-lang" % "scala-reflect" % _
     ),

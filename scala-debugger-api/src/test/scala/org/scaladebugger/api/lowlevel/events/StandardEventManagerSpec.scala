@@ -4,6 +4,7 @@ import com.sun.jdi.event.{Event, EventQueue, EventSet}
 import org.scaladebugger.api.lowlevel.events.EventType._
 import org.scaladebugger.api.lowlevel.events.data.{JDIEventDataProcessor, JDIEventDataRequest, JDIEventDataResult}
 import org.scaladebugger.api.lowlevel.events.filters.{JDIEventFilter, JDIEventFilterProcessor}
+import org.scaladebugger.api.lowlevel.events.misc.YesResume
 import org.scaladebugger.api.utils.LoopingTaskRunner
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
@@ -498,6 +499,35 @@ class StandardEventManagerSpec extends FunSpec with Matchers with MockFactory
         Seq(mockJdiEventFilter)
       )
 
+      val actual = wrapperEventHandler(mock[Event], Nil)
+
+      actual should be (expected)
+    }
+
+    it("should generate a wrapper that invokes the handler and uses the resume value if provided") {
+      val expected = true
+
+      val mockEventHandler = mock[EventManager#EventHandler]
+      val mockJdiEventFilterProcessor = mock[JDIEventFilterProcessor]
+      val mockJdiEventFilter = mock[JDIEventFilter]
+
+      // Filter -> processor, process() == true,
+      // invoke handler and return result of false
+      inSequence {
+        (mockJdiEventFilter.toProcessor _).expects()
+          .returning(mockJdiEventFilterProcessor).once()
+        (mockJdiEventFilterProcessor.process _).expects(*)
+          .returning(true).once()
+        (mockEventHandler.apply _).expects(*, *).returning(false).once()
+      }
+
+      val wrapperEventHandler = eventManager.newWrapperEventHandler(
+        mockEventHandler,
+        Seq(mockJdiEventFilter, YesResume)
+      )
+
+      // Result of invocation would normally be false, but overriden
+      // with YesResume
       val actual = wrapperEventHandler(mock[Event], Nil)
 
       actual should be (expected)

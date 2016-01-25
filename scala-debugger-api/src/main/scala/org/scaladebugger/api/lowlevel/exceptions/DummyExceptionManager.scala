@@ -11,14 +11,6 @@ import scala.util.{Failure, Try}
  */
 class DummyExceptionManager extends ExceptionManager {
   /**
-   * Removes the exception request used to catch all exceptions.
-   *
-   * @return True if the exception request was removed (if it existed),
-   *         otherwise false
-   */
-  override def removeCatchallExceptionRequest(): Boolean = false
-
-  /**
    * Creates a new exception request for the specified exception class.
    *
    * @note Any exception and its subclass will be watched.
@@ -40,13 +32,6 @@ class DummyExceptionManager extends ExceptionManager {
     notifyUncaught: Boolean,
     extraArguments: JDIRequestArgument*
   ): Try[String] = Failure(new DummyOperationException)
-
-  /**
-   * Determines if the exception request to catch all exceptions has been set.
-   *
-   * @return True if set, otherwise false
-   */
-  override def hasCatchallExceptionRequest: Boolean = false
 
   /**
    * Retrieves the list of exception requests contained by this manager.
@@ -85,13 +70,6 @@ class DummyExceptionManager extends ExceptionManager {
   override def exceptionRequestListById: Seq[String] = Nil
 
   /**
-   * Retrieves the exception request used to catch all exceptions.
-   *
-   * @return Some exception request if the catchall has been set, otherwise None
-   */
-  override def getCatchallExceptionRequest: Option[ExceptionRequest] = None
-
-  /**
    * Determines if an exception request exists with the specified id.
    *
    * @param requestId The id of the request used to retrieve and delete it
@@ -122,13 +100,6 @@ class DummyExceptionManager extends ExceptionManager {
   override def getExceptionRequestWithId(
     requestId: String
   ): Option[Seq[ExceptionRequest]] = None
-
-  /**
-   * Retrieves the id of the exception request used to catch all exceptions.
-   *
-   * @return Some id if the catchall has been set, otherwise None
-   */
-  override def getCatchallExceptionRequestId: Option[String] = None
 
   /**
    * Determines if an exception request exists for the specified exception

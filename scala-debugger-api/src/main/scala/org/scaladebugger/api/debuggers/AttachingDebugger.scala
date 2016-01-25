@@ -35,7 +35,7 @@ object AttachingDebugger {
 }
 
 /**
- * Represents a debugger that starts a new process on the same machine.
+ * Represents a debugger that attaches to a remote JVM via a socket.
  *
  * @param virtualMachineManager The manager to use for virtual machine
  *                              connectors

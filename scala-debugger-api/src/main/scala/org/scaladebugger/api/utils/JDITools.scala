@@ -1,6 +1,6 @@
 package org.scaladebugger.api.utils
 
-import java.io.File
+import java.io.{InputStreamReader, BufferedReader, File}
 import java.net.URLClassLoader
 
 /**
@@ -16,9 +16,7 @@ class JDITools private[utils] extends JDILoader with Logging {
    * Converts a class string to a file string.
    *
    * @example org.senkbeil.MyClass becomes org/senkbeil/MyClass.scala
-   *
    * @param classString The class string to convert
-   *
    * @return The resulting file string
    */
   def scalaClassStringToFileString(classString: String) =
@@ -61,7 +59,6 @@ class JDITools private[utils] extends JDILoader with Logging {
    * Spawns a new Scala process using the provided class name as the entrypoint.
    *
    * @note Assumes that Scala is available on the path!
-   *
    * @param className The name of the class to use as the entrypoint for the
    *                  Scala process
    * @param port The port to use for the Scala process to listen on
@@ -72,7 +69,7 @@ class JDITools private[utils] extends JDILoader with Logging {
    * @param suspend Whether or not to start the process suspended until a
    *                debugger attaches to it or it attaches to a debugger
    * @param args The collection of arguments to pass to the Scala process
-   *
+   * @param options Any additional JVM options to pass to the Scala process
    * @return The created Scala process
    */
   def spawn(
@@ -81,7 +78,8 @@ class JDITools private[utils] extends JDILoader with Logging {
     hostname: String = "",
     server: Boolean = true,
     suspend: Boolean = false,
-    args: Seq[String] = Nil
+    args: Seq[String] = Nil,
+    options: Seq[String] = Nil
   ): Process = {
     val jdwpString = generateJdwpString(
       port = port,
@@ -95,9 +93,42 @@ class JDITools private[utils] extends JDILoader with Logging {
     jdiProcess.setClassPath(jvmClassPath)
     jdiProcess.setClassName(className)
     jdiProcess.setDirectory(getUserDir)
+    jdiProcess.setArguments(args)
+    jdiProcess.setJvmOptions(options)
 
     jdiProcess.start()
   }
+
+  /**
+   * Collects a list of active Java processes using the JPS tool.
+   *
+   * @note Will fail if the JPS tool is not on PATH.
+   *
+   * @param javaProcessFunc Optional function to convert line of text into a
+   *                        Java process instance
+   * @return The collection of active Java processes
+   */
+  def javaProcesses(
+    javaProcessFunc: String => Option[JavaProcess] =
+      JavaProcess.fromJpsString(_: String)
+  ): Seq[JavaProcess] = {
+    val p = spawnJavaProcessRetrieval()
+    val reader = new BufferedReader(new InputStreamReader(p.getInputStream))
+
+    val stream = Stream.continually(reader.readLine()).takeWhile(_ != null)
+    val jProcesses = stream.map(_.trim).force.flatMap(javaProcessFunc(_))
+
+    reader.close()
+    Seq(jProcesses: _*)
+  }
+
+  /**
+   * Spawns a new process to retrieve the list of Java processes.
+   *
+   * @return The process instance
+   */
+  protected def spawnJavaProcessRetrieval(): Process =
+    Runtime.getRuntime.exec("jps -vl")
 
   /**
    * Creates a new JDI process instance.
@@ -128,7 +159,6 @@ class JDITools private[utils] extends JDILoader with Logging {
    *                established
    * @param hostname If provided, used as the hostname to connect or bind
    *                 to depending on the server flag
-   *
    * @return The string representing the JDWP settings
    */
   def generateJdwpString(

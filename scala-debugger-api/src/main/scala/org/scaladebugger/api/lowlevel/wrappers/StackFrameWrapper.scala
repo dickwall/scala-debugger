@@ -59,10 +59,27 @@ class StackFrameWrapper(private val _stackFrame: StackFrame) extends Logging {
    */
   def localVisibleVariableMap(): Map[LocalVariable, Value] =
     Try(_stackFrame.visibleVariables()).map(_.asScala).getOrElse(Nil)
-      .filterNot(_.isArgument)
       .map(variable =>
         variable -> extractValue(Try(_stackFrame.getValue(variable)))
       ).toMap
+
+  /**
+   * Retrieves local variables that are arguments and their values for the
+   * underlying stack frame.
+   *
+   * @return The map of local variables paired with their respective values
+   */
+  def localArgumentMap(): Map[LocalVariable, Value] =
+    localVisibleVariableMap().filterKeys(_.isArgument)
+
+  /**
+   * Retrieves local variables that are not arguments and their values for the
+   * underlying stack frame.
+   *
+   * @return The map of local variables paired with their respective values
+   */
+  def localNonArgumentMap(): Map[LocalVariable, Value] =
+    localVisibleVariableMap().filterKeys(k => !k.isArgument)
 
   /**
    * Retrieves the specified local variable and its value for the underlying

@@ -8,8 +8,12 @@ import org.scaladebugger.api.lowlevel.exceptions.PendingExceptionSupport
 import org.scaladebugger.api.lowlevel.methods.{PendingMethodExitSupport, PendingMethodEntrySupport}
 import org.scaladebugger.api.lowlevel.utils.JDIHelperMethods
 import org.scaladebugger.api.lowlevel.watchpoints.{PendingModificationWatchpointSupport, PendingAccessWatchpointSupport}
+import org.scaladebugger.api.profiles.dotty.DottyDebugProfile
 import org.scaladebugger.api.profiles.pure.PureDebugProfile
 import org.scaladebugger.api.profiles.ProfileManager
+import org.scaladebugger.api.profiles.scala210.Scala210DebugProfile
+import org.scaladebugger.api.profiles.scala211.Scala211DebugProfile
+import org.scaladebugger.api.profiles.scala212.Scala212DebugProfile
 import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.DebugProfile
 import org.scaladebugger.api.utils.{LoopingTaskRunner, Logging}
@@ -52,7 +56,6 @@ class StandardScalaVirtualMachine(
    *
    * @param loopingTaskRunner The looping task runner to provide to various
    *                          managers
-   *
    * @return The new container of managers
    */
   protected def newManagerContainer(
@@ -75,10 +78,7 @@ class StandardScalaVirtualMachine(
     logger.debug(vmString("Initializing Scala virtual machine!"))
 
     // Register our standard profiles
-    this.register(
-      PureDebugProfile.Name,
-      new PureDebugProfile(_virtualMachine, lowlevel)
-    )
+    registerStandardProfiles()
 
     // Mark our default profile
     this.use(PureDebugProfile.Name)
@@ -114,6 +114,33 @@ class StandardScalaVirtualMachine(
 
     // Try to start the event manager if indicated
     if (startProcessingEvents) Try(lowlevel.eventManager.start())
+  }
+
+  private def registerStandardProfiles(): Unit = {
+    this.register(
+      PureDebugProfile.Name,
+      new PureDebugProfile(_virtualMachine, lowlevel)
+    )
+
+    this.register(
+      Scala210DebugProfile.Name,
+      new Scala210DebugProfile(_virtualMachine, lowlevel)
+    )
+
+    this.register(
+      Scala211DebugProfile.Name,
+      new Scala211DebugProfile(_virtualMachine, lowlevel)
+    )
+
+    this.register(
+      Scala212DebugProfile.Name,
+      new Scala212DebugProfile(_virtualMachine, lowlevel)
+    )
+
+    this.register(
+      DottyDebugProfile.Name,
+      new DottyDebugProfile(_virtualMachine, lowlevel)
+    )
   }
 
   private def processPendingForFile(fileName: String): Unit = {
@@ -170,7 +197,6 @@ class StandardScalaVirtualMachine(
    * Retrieves the profile with the provided name.
    *
    * @param name The name of the profile to retrieve
-   *
    * @return Some debug profile if found, otherwise None
    */
   override def retrieve(name: String): Option[DebugProfile] =
@@ -180,7 +206,6 @@ class StandardScalaVirtualMachine(
    * Unregisters the profile with the provided name.
    *
    * @param name The name of the profile to unregister
-   *
    * @return Some debug profile if unregistered, otherwise None
    */
   override def unregister(name: String): Option[DebugProfile] =

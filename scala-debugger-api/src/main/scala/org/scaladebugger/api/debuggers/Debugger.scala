@@ -2,15 +2,17 @@ package org.scaladebugger.api.debuggers
 
 import java.util.concurrent.ConcurrentHashMap
 
-import org.scaladebugger.api.utils.JDILoader
+import org.scaladebugger.api.utils.{Logging, JDILoader}
 import org.scaladebugger.api.virtualmachines.{DummyScalaVirtualMachine, ScalaVirtualMachine}
 
 import scala.collection.JavaConverters._
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Promise, Future}
 
 /**
  * Represents the generic interface that all debugger instances implement.
  */
-trait Debugger {
+trait Debugger extends Logging {
   protected val jdiLoader = new JDILoader(this.getClass.getClassLoader)
   private val pendingScalaVirtualMachines =
     new ConcurrentHashMap[String, ScalaVirtualMachine]().asScala
@@ -50,6 +52,79 @@ trait Debugger {
   def start[T](newVirtualMachineFunc: ScalaVirtualMachine => T): Unit = {
     start(startProcessingEvents = true, newVirtualMachineFunc)
   }
+
+  /**
+   * Starts the debugger, performing any necessary setup and ending with
+   * an initialized debugger that is or will be capable of connecting to one or
+   * more virtual machine instances.
+   *
+   * @note Returned future represents next connected Scala virtual machine. All
+   *       other Scala virtual machines connected after the first one will be
+   *       ignored.
+   *
+   * @param startProcessingEvents If true, events are immediately processed by
+   *                              the VM as soon as it is connected
+   *
+   * @return The future representing the connected Scala virtual machine
+   */
+  def start(startProcessingEvents: Boolean): Future[ScalaVirtualMachine] = {
+    val promise = Promise[ScalaVirtualMachine]()
+
+    start(startProcessingEvents, s => if (!promise.trySuccess(s)) logger.warn(
+      s"Unable to accept JVM ${s.uniqueId} as future already completed!"
+    ))
+
+    promise.future
+  }
+
+  /**
+   * Starts the debugger, performing any necessary setup and ending with
+   * an initialized debugger that is or will be capable of connecting to one or
+   * more virtual machine instances.
+   *
+   * @note Returned future represents next connected Scala virtual machine. All
+   *       other Scala virtual machines connected after the first one will be
+   *       ignored.
+   *
+   * @return The future representing the connected Scala virtual machine
+   */
+  def start(): Future[ScalaVirtualMachine] = start(startProcessingEvents = true)
+
+  /**
+   * Starts the debugger, performing any necessary setup and ending with
+   * an initialized debugger that is or will be capable of connecting to one or
+   * more virtual machine instances.
+   *
+   * @note Returned Scala virtual machine represents next connected Scala
+   *       virtual machine. All other Scala virtual machines connected after
+   *       the first one will be ignored.
+   *
+   * @param timeout The maximum time to wait for the JVM to connect
+   * @param startProcessingEvents If true, events are immediately processed by
+   *                              the VM as soon as it is connected
+   *
+   * @return The connected Scala virtual machine
+   */
+  def start(
+    timeout: Duration,
+    startProcessingEvents: Boolean
+  ): ScalaVirtualMachine = Await.result(start(startProcessingEvents), timeout)
+
+  /**
+   * Starts the debugger, performing any necessary setup and ending with
+   * an initialized debugger that is or will be capable of connecting to one or
+   * more virtual machine instances.
+   *
+   * @note Returned Scala virtual machine represents next connected Scala
+   *       virtual machine. All other Scala virtual machines connected after
+   *       the first one will be ignored.
+   *
+   * @param timeout The maximum time to wait for the JVM to connect
+   *
+   * @return The connected Scala virtual machine
+   */
+  def start(timeout: Duration): ScalaVirtualMachine =
+    start(timeout, startProcessingEvents = true)
 
   /**
    * Starts the debugger, performing any necessary setup and ending with
@@ -102,7 +177,6 @@ trait Debugger {
    * a wrapper around [[Debugger.addPendingScalaVirtualMachine)]].
    *
    * @param scalaVirtualMachine The Scala virtual machine to add
-   *
    * @return The debugger instance updated with the new pending operations
    */
   def withPending(scalaVirtualMachine: ScalaVirtualMachine): Debugger = {
@@ -115,7 +189,6 @@ trait Debugger {
    * a wrapper around [[Debugger.removePendingScalaVirtualMachine]].
    *
    * @param scalaVirtualMachineId The id of the Scala virtual machine to remove
-   *
    * @return The updated debugger instance
    */
   def withoutPending(scalaVirtualMachineId: String): Debugger = {
@@ -128,7 +201,6 @@ trait Debugger {
    * to any new Scala virtual machine resulting from this debugger.
    *
    * @param scalaVirtualMachine The Scala virtual machine to add
-   *
    * @return Some Scala virtual machine if added, otherwise None
    */
   def addPendingScalaVirtualMachine(
@@ -151,7 +223,6 @@ trait Debugger {
    * debugger.
    *
    * @param scalaVirtualMachineId The id of the Scala virtual machine to remove
-   *
    * @return Some Scala virtual machine if removed, otherwise None
    */
   def removePendingScalaVirtualMachine(

@@ -1,12 +1,13 @@
 package org.scaladebugger.api.debuggers
 
-import org.scalamock.scalatest.MockFactory
-import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.utils.JDILoader
-import org.scaladebugger.api.virtualmachines.{DummyScalaVirtualMachine, ScalaVirtualMachine, StandardScalaVirtualMachine}
+import org.scaladebugger.api.virtualmachines.{DummyScalaVirtualMachine, ScalaVirtualMachine}
+import org.scalamock.scalatest.MockFactory
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 
 class DebuggerSpec extends FunSpec with Matchers with ParallelTestExecution
-  with MockFactory
+  with MockFactory with ScalaFutures
 {
   private class TestDebugger(override val jdiLoader: JDILoader)
     extends Debugger
@@ -23,6 +24,75 @@ class DebuggerSpec extends FunSpec with Matchers with ParallelTestExecution
   }
 
   describe("Debugger") {
+    describe("#start") {
+      it("should be able to return a future for the first new JVM") {
+        var newVMFunc: ScalaVirtualMachine => _ = null
+
+        val debugger = new TestDebugger(new JDILoader()) {
+          override def start[T](
+            startProcessingEvents: Boolean,
+            newVirtualMachineFunc: (ScalaVirtualMachine) => T
+          ): Unit = newVMFunc = newVirtualMachineFunc
+        }
+
+        val mockScalaVirtualMachine = mock[ScalaVirtualMachine]
+        val f = debugger.start()
+        newVMFunc(mockScalaVirtualMachine)
+
+        whenReady(f) { s => s should be (mockScalaVirtualMachine) }
+      }
+
+      it("should be able to return a future that ignores any additional JVMs") {
+        var newVMFunc: ScalaVirtualMachine => _ = null
+
+        val debugger = new TestDebugger(new JDILoader()) {
+          override def start[T](
+            startProcessingEvents: Boolean,
+            newVirtualMachineFunc: (ScalaVirtualMachine) => T
+          ): Unit = newVMFunc = newVirtualMachineFunc
+        }
+
+        val mockScalaVirtualMachine = mock[ScalaVirtualMachine]
+        val f = debugger.start()
+
+        newVMFunc(mockScalaVirtualMachine)
+        newVMFunc(mock[ScalaVirtualMachine])
+        newVMFunc(mock[ScalaVirtualMachine])
+
+        whenReady(f) { s => s should be (mockScalaVirtualMachine) }
+      }
+
+      it("should be able to wait for a future to complete") {
+        val mockScalaVirtualMachine = mock[ScalaVirtualMachine]
+
+        val debugger = new TestDebugger(new JDILoader()) {
+          override def start[T](
+            startProcessingEvents: Boolean,
+            newVirtualMachineFunc: (ScalaVirtualMachine) => T
+          ): Unit = newVirtualMachineFunc(mockScalaVirtualMachine)
+        }
+
+        import scala.concurrent.duration._
+        debugger.start(1.second) should be (mockScalaVirtualMachine)
+      }
+
+      it("should throw an exception if the returned future fails to complete") {
+        import scala.concurrent.duration._
+        val timeout = 10.milliseconds
+
+        val debugger = new TestDebugger(new JDILoader()) {
+          override def start[T](
+            startProcessingEvents: Boolean,
+            newVirtualMachineFunc: (ScalaVirtualMachine) => T
+          ): Unit = {}
+        }
+
+        intercept[scala.concurrent.TimeoutException] {
+          debugger.start(timeout)
+        }
+      }
+    }
+
     describe("#isAvailable") {
       it("should return true if jdi loader is available") {
         val expected = true

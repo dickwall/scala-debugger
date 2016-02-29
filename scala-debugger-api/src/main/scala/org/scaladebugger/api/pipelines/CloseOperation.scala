@@ -1,4 +1,5 @@
 package org.scaladebugger.api.pipelines
+import acyclic.file
 
 /**
  * Represents an operation that closes the pipeline.
@@ -7,7 +8,7 @@ package org.scaladebugger.api.pipelines
  * @param closeFunc The function to be executed by the close operation
  */
 class CloseOperation[A](
-  private val closeFunc: Pipeline.CloseFunction
+  private val closeFunc: () => Unit
 ) extends Operation[A, Unit] {
   /**
    * Ignores the incoming data and closes the pipeline.

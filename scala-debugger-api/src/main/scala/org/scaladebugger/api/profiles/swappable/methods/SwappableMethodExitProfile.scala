@@ -1,9 +1,10 @@
 package org.scaladebugger.api.profiles.swappable.methods
+import acyclic.file
 
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.methods.MethodExitRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
-import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
+import org.scaladebugger.api.profiles.swappable.SwappableDebugProfileManagement
 import org.scaladebugger.api.profiles.traits.methods.MethodExitProfile
 
 import scala.util.Try
@@ -13,7 +14,7 @@ import scala.util.Try
  * invocation to another profile.
  */
 trait SwappableMethodExitProfile extends MethodExitProfile {
-  this: SwappableDebugProfile =>
+  this: SwappableDebugProfileManagement =>
 
   override def onMethodExitWithData(
     className: String,

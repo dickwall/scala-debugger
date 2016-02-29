@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.scala212
+import acyclic.file
 
 import com.sun.jdi.VirtualMachine
 import org.scaladebugger.api.lowlevel.ManagerContainer
@@ -6,7 +7,7 @@ import org.scaladebugger.api.profiles.scala212.breakpoints.Scala212BreakpointPro
 import org.scaladebugger.api.profiles.scala212.classes.{Scala212ClassPrepareProfile, Scala212ClassUnloadProfile}
 import org.scaladebugger.api.profiles.scala212.events.Scala212EventProfile
 import org.scaladebugger.api.profiles.scala212.exceptions.Scala212ExceptionProfile
-import org.scaladebugger.api.profiles.scala212.info.Scala212MiscInfoProfile
+import org.scaladebugger.api.profiles.scala212.info.{Scala212GrabInfoProfile, Scala212MiscInfoProfile}
 import org.scaladebugger.api.profiles.scala212.methods.{Scala212MethodEntryProfile, Scala212MethodExitProfile}
 import org.scaladebugger.api.profiles.scala212.monitors.{Scala212MonitorContendedEnterProfile, Scala212MonitorContendedEnteredProfile, Scala212MonitorWaitProfile, Scala212MonitorWaitedProfile}
 import org.scaladebugger.api.profiles.scala212.steps.Scala212StepProfile
@@ -40,6 +41,7 @@ class Scala212DebugProfile(
   with Scala212ClassUnloadProfile
   with Scala212EventProfile
   with Scala212ExceptionProfile
+  with Scala212GrabInfoProfile
   with Scala212MethodEntryProfile
   with Scala212MethodExitProfile
   with Scala212MiscInfoProfile

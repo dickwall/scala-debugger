@@ -1,4 +1,5 @@
 package test
+import acyclic.file
 
 import org.scalatest.time.{Span, Milliseconds, Seconds}
 

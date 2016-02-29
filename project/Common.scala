@@ -10,7 +10,7 @@ object Common {
   )
 
   def settings = Seq(
-    version := "1.0.0",
+    version := "1.0.1-SNAPSHOT",
 
     organization := "org.scala-debugger",
 
@@ -19,7 +19,7 @@ object Common {
       url("https://www.apache.org/licenses/LICENSE-2.0.html")
     ),
 
-    homepage := Some(url("http://scala-debugger.org")),
+    homepage := Some(url("https://scala-debugger.org")),
 
     // Default version when not cross-compiling
     scalaVersion := "2.10.5",

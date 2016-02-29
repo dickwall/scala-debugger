@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.steps
+import acyclic.file
 
 import java.util.concurrent.atomic.AtomicBoolean
 import com.sun.jdi.ThreadReference

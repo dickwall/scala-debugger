@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.scala210.steps
+import acyclic.file
 
 import org.scaladebugger.api.profiles.pure.steps.PureStepProfile
 

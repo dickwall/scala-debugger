@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.monitors
+import acyclic.file
 
 import com.sun.jdi.request.{MonitorWaitedRequest, EventRequestManager}
 import org.scaladebugger.api.lowlevel.requests.Implicits._

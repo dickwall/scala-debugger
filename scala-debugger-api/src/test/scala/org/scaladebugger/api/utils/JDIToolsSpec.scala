@@ -1,4 +1,5 @@
 package org.scaladebugger.api.utils
+import acyclic.file
 
 import java.io.ByteArrayInputStream
 import java.net.{URL, URLClassLoader}

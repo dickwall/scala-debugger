@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.scala211.events
+import acyclic.file
 
 import org.scaladebugger.api.profiles.pure.events.PureEventProfile
 

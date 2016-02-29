@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.pure.breakpoints
+import acyclic.file
 
 import com.sun.jdi.event.Event
 import org.scaladebugger.api.lowlevel.breakpoints.{BreakpointManager, BreakpointRequestInfo, PendingBreakpointSupportLike}

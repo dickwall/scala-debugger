@@ -1,4 +1,5 @@
 package test
+import acyclic.file
 
 import com.sun.jdi.request.MethodEntryRequest
 import org.scaladebugger.api.lowlevel.methods.{MethodEntryRequestInfo, MethodEntryManager}

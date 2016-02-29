@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.dotty.exceptions
+import acyclic.file
 
 import org.scaladebugger.api.profiles.pure.exceptions.PureExceptionProfile
 

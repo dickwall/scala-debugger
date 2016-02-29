@@ -1,4 +1,5 @@
 package org.scaladebugger.api.pipelines
+import acyclic.file
 
 /**
  * Represents an operation that does nothing (no-op).

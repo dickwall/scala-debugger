@@ -1,4 +1,5 @@
 package org.scaladebugger.requests
+import acyclic.file
 
 import org.scaladebugger.api.utils.JDITools
 import org.scalatest.concurrent.Eventually

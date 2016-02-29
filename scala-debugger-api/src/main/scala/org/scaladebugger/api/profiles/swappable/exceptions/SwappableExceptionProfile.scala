@@ -1,9 +1,10 @@
 package org.scaladebugger.api.profiles.swappable.exceptions
+import acyclic.file
 
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.exceptions.ExceptionRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
-import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
+import org.scaladebugger.api.profiles.swappable.SwappableDebugProfileManagement
 import org.scaladebugger.api.profiles.traits.exceptions.ExceptionProfile
 
 import scala.util.Try
@@ -13,7 +14,7 @@ import scala.util.Try
  * invocation to another profile.
  */
 trait SwappableExceptionProfile extends ExceptionProfile {
-  this: SwappableDebugProfile =>
+  this: SwappableDebugProfileManagement =>
 
   override def onExceptionWithData(
     exceptionName: String,

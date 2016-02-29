@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.watchpoints
+import acyclic.file
 
 import com.sun.jdi.request.{ModificationWatchpointRequest, EventRequest, EventRequestManager}
 import com.sun.jdi.{ReferenceType, VirtualMachine}

@@ -7,6 +7,7 @@ lazy val scalaDebuggerApi = project
   .in(file("scala-debugger-api"))
   .configs(IntegrationTest)
   .settings(Common.settings: _*)
+  .settings(Acyclic.settings: _*)
   .settings(Defaults.itSettings: _*)
   .settings(Api.settings: _*)
   .settings(name := "scala-debugger-api")
@@ -19,6 +20,7 @@ lazy val scalaDebuggerApi = project
 lazy val scalaDebuggerTest = project
   .in(file("scala-debugger-test"))
   .settings(Common.settings: _*)
+  .settings(Acyclic.settings: _*)
   .settings(
     // Do not publish the test project
     publishArtifact := false,
@@ -31,6 +33,7 @@ lazy val scalaDebuggerTest = project
 lazy val scalaDebuggerMacros = project
   .in(file("scala-debugger-macros"))
   .settings(Common.settings: _*)
+  .settings(Acyclic.settings: _*)
   .settings(Macros.settings: _*)
   .settings(name := "scala-debugger-macros")
 
@@ -41,6 +44,7 @@ lazy val scalaDebuggerLanguage = project
   .in(file("scala-debugger-language"))
   .configs(IntegrationTest)
   .settings(Common.settings: _*)
+  .settings(Acyclic.settings: _*)
   .settings(Defaults.itSettings: _*)
   .settings(Language.settings: _*)
   .settings(Macros.settings: _*)
@@ -54,6 +58,7 @@ lazy val scalaDebuggerRepl = project
   .in(file("scala-debugger-repl"))
   .configs(IntegrationTest)
   .settings(Common.settings: _*)
+  .settings(Acyclic.settings: _*)
   .settings(Defaults.itSettings: _*)
   .settings(Repl.settings: _*)
   .settings(name := "scala-debugger-repl")
@@ -66,6 +71,7 @@ lazy val scalaDebuggerRepl = project
 lazy val root = project
   .in(file("."))
   .settings(Common.settings: _*)
+  .settings(Acyclic.settings: _*)
   .settings(unidocSettings: _*)
   .settings(
     name := "scala-debugger",

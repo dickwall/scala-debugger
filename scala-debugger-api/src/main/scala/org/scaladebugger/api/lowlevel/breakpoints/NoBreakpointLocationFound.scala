@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.breakpoints
+import acyclic.file
 
 /**
  * Represents an exception that occurred when attempting to create a breakpoint

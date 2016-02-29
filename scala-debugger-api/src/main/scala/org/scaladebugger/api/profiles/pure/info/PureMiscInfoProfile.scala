@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.pure.info
+//import acyclic.file
 
 import org.scaladebugger.api.lowlevel.classes.ClassManager
 import org.scaladebugger.api.lowlevel.utils.JDIHelperMethods

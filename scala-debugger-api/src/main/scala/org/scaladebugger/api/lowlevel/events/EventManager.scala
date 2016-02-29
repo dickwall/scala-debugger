@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.events
+//import acyclic.file
 
 import com.sun.jdi.event.{Event, EventQueue, EventSet}
 import org.scaladebugger.api.lowlevel.events.EventType._

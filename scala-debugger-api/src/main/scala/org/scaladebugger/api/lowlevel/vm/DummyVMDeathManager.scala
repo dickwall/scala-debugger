@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.vm
+import acyclic.file
 
 import com.sun.jdi.request.VMDeathRequest
 import org.scaladebugger.api.lowlevel.DummyOperationException

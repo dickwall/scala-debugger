@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles
+import acyclic.file
 
 import org.scaladebugger.api.profiles.traits.DebugProfile
 

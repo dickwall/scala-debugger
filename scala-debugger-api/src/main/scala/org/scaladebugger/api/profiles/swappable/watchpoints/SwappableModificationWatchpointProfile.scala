@@ -1,9 +1,10 @@
 package org.scaladebugger.api.profiles.swappable.watchpoints
+import acyclic.file
 
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.watchpoints.ModificationWatchpointRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
-import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
+import org.scaladebugger.api.profiles.swappable.SwappableDebugProfileManagement
 import org.scaladebugger.api.profiles.traits.watchpoints.ModificationWatchpointProfile
 
 import scala.util.Try
@@ -13,7 +14,7 @@ import scala.util.Try
  * redirects the invocation to another profile.
  */
 trait SwappableModificationWatchpointProfile extends ModificationWatchpointProfile {
-  this: SwappableDebugProfile =>
+  this: SwappableDebugProfileManagement =>
 
   override def onModificationWatchpointWithData(
     className: String,

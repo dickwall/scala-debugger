@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.traits.classes
+import acyclic.file
 
 import com.sun.jdi.event.ClassUnloadEvent
 import org.scaladebugger.api.lowlevel.JDIArgument

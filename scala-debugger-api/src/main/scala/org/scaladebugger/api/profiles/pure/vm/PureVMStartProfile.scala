@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.pure.vm
+import acyclic.file
 
 import com.sun.jdi.event.VMStartEvent
 import org.scaladebugger.api.lowlevel.JDIArgument

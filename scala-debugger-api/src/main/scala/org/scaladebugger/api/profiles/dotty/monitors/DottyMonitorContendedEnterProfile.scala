@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.dotty.monitors
+import acyclic.file
 
 import org.scaladebugger.api.profiles.pure.monitors.PureMonitorContendedEnterProfile
 

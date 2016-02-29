@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.pure.events
+import acyclic.file
 
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.{PendingEventHandlerSupportLike, EventHandlerInfo, EventManager}

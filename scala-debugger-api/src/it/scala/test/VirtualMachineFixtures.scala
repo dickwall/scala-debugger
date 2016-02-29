@@ -1,4 +1,5 @@
 package test
+import acyclic.file
 
 import java.io.{InputStreamReader, BufferedReader}
 import java.util.concurrent.atomic.AtomicBoolean

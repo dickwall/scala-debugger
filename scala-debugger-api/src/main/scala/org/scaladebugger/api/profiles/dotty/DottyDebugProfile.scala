@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.dotty
+import acyclic.file
 
 import com.sun.jdi.VirtualMachine
 import org.scaladebugger.api.lowlevel.ManagerContainer
@@ -6,7 +7,7 @@ import org.scaladebugger.api.profiles.dotty.breakpoints.DottyBreakpointProfile
 import org.scaladebugger.api.profiles.dotty.classes.{DottyClassPrepareProfile, DottyClassUnloadProfile}
 import org.scaladebugger.api.profiles.dotty.events.DottyEventProfile
 import org.scaladebugger.api.profiles.dotty.exceptions.DottyExceptionProfile
-import org.scaladebugger.api.profiles.dotty.info.DottyMiscInfoProfile
+import org.scaladebugger.api.profiles.dotty.info.{DottyGrabInfoProfile, DottyMiscInfoProfile}
 import org.scaladebugger.api.profiles.dotty.methods.{DottyMethodEntryProfile, DottyMethodExitProfile}
 import org.scaladebugger.api.profiles.dotty.monitors.{DottyMonitorContendedEnterProfile, DottyMonitorContendedEnteredProfile, DottyMonitorWaitProfile, DottyMonitorWaitedProfile}
 import org.scaladebugger.api.profiles.dotty.steps.DottyStepProfile
@@ -41,6 +42,7 @@ class DottyDebugProfile(
   with DottyClassUnloadProfile
   with DottyEventProfile
   with DottyExceptionProfile
+  with DottyGrabInfoProfile
   with DottyMethodEntryProfile
   with DottyMethodExitProfile
   with DottyMiscInfoProfile

@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.methods
+import acyclic.file
 
 import com.sun.jdi.request.{EventRequestManager, MethodExitRequest}
 import org.scaladebugger.api.lowlevel.requests.Implicits._

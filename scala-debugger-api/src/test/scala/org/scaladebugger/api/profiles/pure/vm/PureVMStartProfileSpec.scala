@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.pure.vm
+import acyclic.file
 
 import com.sun.jdi.event.{EventQueue, Event, VMStartEvent}
 import org.scalamock.scalatest.MockFactory

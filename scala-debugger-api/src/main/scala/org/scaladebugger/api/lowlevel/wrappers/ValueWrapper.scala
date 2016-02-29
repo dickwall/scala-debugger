@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.wrappers
+import acyclic.file
 
 import com.sun.jdi._
 
@@ -63,14 +64,14 @@ class ValueWrapper(private val _value: Value) {
     require(isPrimitive, "Value is not a primitive!")
 
     _value match {
-      case booleanValue: BooleanValue => booleanValue.value()
-      case byteValue: ByteValue => byteValue.value()
-      case charValue: CharValue => charValue.value()
-      case doubleValue: DoubleValue => doubleValue.value()
-      case floatValue: FloatValue => floatValue.value()
-      case integerValue: IntegerValue => integerValue.value()
-      case longValue: LongValue => longValue.value()
-      case shortValue: ShortValue => shortValue.value()
+      case booleanValue: BooleanValue     => booleanValue.value()
+      case byteValue: ByteValue           => byteValue.value()
+      case charValue: CharValue           => charValue.value()
+      case doubleValue: DoubleValue       => doubleValue.value()
+      case floatValue: FloatValue         => floatValue.value()
+      case integerValue: IntegerValue     => integerValue.value()
+      case longValue: LongValue           => longValue.value()
+      case shortValue: ShortValue         => shortValue.value()
       case primitiveValue: PrimitiveValue =>
         throw new Throwable("Unknown primitive: " + primitiveValue)
     }
@@ -97,8 +98,8 @@ class ValueWrapper(private val _value: Value) {
 
     _value match {
       case stringReference: StringReference => stringReference.value()
-      case arrayReference: ArrayReference => arrayReference.getValues
-      case _ => _value.toString
+      case arrayReference: ArrayReference   => arrayReference.getValues
+      case _                                => _value.toString
     }
   }
 
@@ -185,7 +186,8 @@ class ValueWrapper(private val _value: Value) {
   private def buildString(
     stringBuilder: StringBuilder,
     maxRecursionLevel: Int,
-    currentRecursionLevel: Int): Unit = {
+    currentRecursionLevel: Int
+  ): Unit = {
     // Exit if reached maximum level of recursion
     if (currentRecursionLevel >= maxRecursionLevel) return
 

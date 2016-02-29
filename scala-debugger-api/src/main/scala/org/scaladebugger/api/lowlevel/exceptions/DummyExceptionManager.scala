@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.exceptions
+import acyclic.file
 
 import com.sun.jdi.request.ExceptionRequest
 import org.scaladebugger.api.lowlevel.DummyOperationException

@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.swappable
+import acyclic.file
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
@@ -7,7 +8,7 @@ import org.scaladebugger.api.lowlevel.events.EventType.EventType
 import org.scaladebugger.api.profiles.ProfileManager
 import org.scaladebugger.api.profiles.traits.DebugProfile
 
-class SwappableDebugProfileSpec extends FunSpec with Matchers
+class SwappableDebugProfileManagementSpec extends FunSpec with Matchers
   with ParallelTestExecution with MockFactory
 {
   private val mockDebugProfile = mock[DebugProfile]
@@ -17,7 +18,7 @@ class SwappableDebugProfileSpec extends FunSpec with Matchers
     override protected val profileManager: ProfileManager = mockProfileManager
   }
 
-  describe("SwappableDebugProfile") {
+  describe("SwappableDebugProfileManagement") {
     describe("#use") {
       it("should set the current underlying profile") {
         val expected = mockDebugProfile

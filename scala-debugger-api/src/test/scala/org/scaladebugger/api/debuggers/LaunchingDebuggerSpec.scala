@@ -1,4 +1,5 @@
 package org.scaladebugger.api.debuggers
+import acyclic.file
 
 import com.sun.jdi.connect.{Connector, LaunchingConnector}
 import com.sun.jdi.{ReferenceType, VirtualMachine, VirtualMachineManager}

@@ -1,9 +1,10 @@
 package org.scaladebugger.api.profiles.swappable.threads
+import acyclic.file
 
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.threads.ThreadStartRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
-import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
+import org.scaladebugger.api.profiles.swappable.SwappableDebugProfileManagement
 import org.scaladebugger.api.profiles.traits.threads.ThreadStartProfile
 
 import scala.util.Try
@@ -13,7 +14,7 @@ import scala.util.Try
  * invocation to another profile.
  */
 trait SwappableThreadStartProfile extends ThreadStartProfile {
-  this: SwappableDebugProfile =>
+  this: SwappableDebugProfileManagement =>
 
   override def onThreadStartWithData(
     extraArguments: JDIArgument*

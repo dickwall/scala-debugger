@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.swappable.steps
+import acyclic.file
 
 import com.sun.jdi.ThreadReference
 import org.scalamock.scalatest.MockFactory

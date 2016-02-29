@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.steps
+import acyclic.file
 
 import org.scaladebugger.api.utils.PendingActionManager
 

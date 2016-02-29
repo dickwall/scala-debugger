@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.swappable.breakpoints
+import acyclic.file
 
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{ParallelTestExecution, Matchers, FunSpec}

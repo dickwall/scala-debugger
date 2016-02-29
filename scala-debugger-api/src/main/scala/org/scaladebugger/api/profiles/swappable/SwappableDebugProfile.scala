@@ -1,11 +1,12 @@
 package org.scaladebugger.api.profiles.swappable
+import acyclic.file
 
 import org.scaladebugger.api.profiles.ProfileManager
 import org.scaladebugger.api.profiles.swappable.breakpoints.SwappableBreakpointProfile
 import org.scaladebugger.api.profiles.swappable.classes.{SwappableClassPrepareProfile, SwappableClassUnloadProfile}
 import org.scaladebugger.api.profiles.swappable.events.SwappableEventProfile
 import org.scaladebugger.api.profiles.swappable.exceptions.SwappableExceptionProfile
-import org.scaladebugger.api.profiles.swappable.info.SwappableMiscInfoProfile
+import org.scaladebugger.api.profiles.swappable.info.{SwappableGrabInfoProfile, SwappableMiscInfoProfile}
 import org.scaladebugger.api.profiles.swappable.methods.{SwappableMethodEntryProfile, SwappableMethodExitProfile}
 import org.scaladebugger.api.profiles.swappable.monitors.{SwappableMonitorContendedEnteredProfile, SwappableMonitorContendedEnterProfile, SwappableMonitorWaitedProfile, SwappableMonitorWaitProfile}
 import org.scaladebugger.api.profiles.swappable.steps.SwappableStepProfile
@@ -27,12 +28,14 @@ object SwappableDebugProfile {
  */
 trait SwappableDebugProfile
   extends DebugProfile
+  with SwappableDebugProfileManagement
   with SwappableAccessWatchpointProfile
   with SwappableBreakpointProfile
   with SwappableClassPrepareProfile
   with SwappableClassUnloadProfile
   with SwappableEventProfile
   with SwappableExceptionProfile
+  with SwappableGrabInfoProfile
   with SwappableMethodEntryProfile
   with SwappableMethodExitProfile
   with SwappableMiscInfoProfile
@@ -47,44 +50,3 @@ trait SwappableDebugProfile
   with SwappableVMStartProfile
   with SwappableVMDeathProfile
   with SwappableVMDisconnectProfile
-{
-  protected val profileManager: ProfileManager
-
-  @volatile private var currentProfileName = ""
-
-  /**
-   * Sets the current profile to the one with the provided name.
-   *
-   * @param name The name of the profile
-   *
-   * @return The updated profile
-   */
-  def use(name: String): DebugProfile = {
-    currentProfileName = name
-    this
-  }
-
-  /**
-   * Retrieves the current underlying profile.
-   *
-   * @return The active underlying profile
-   */
-  def withCurrentProfile: DebugProfile = withProfile(currentProfileName)
-
-  /**
-   * Retrieves the profile with the provided name.
-   *
-   * @param name The name of the profile
-   *
-   * @throws AssertionError If the profile is not found
-   * @return The debug profile
-   */
-  @throws[AssertionError]
-  def withProfile(name: String): DebugProfile = {
-    val profile = profileManager.retrieve(name)
-
-    assert(profile.nonEmpty, s"Profile $name does not exist!")
-
-    profile.get
-  }
-}

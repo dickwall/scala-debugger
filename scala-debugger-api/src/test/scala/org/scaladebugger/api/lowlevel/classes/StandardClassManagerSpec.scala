@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.classes
+import acyclic.file
 
 import com.sun.jdi.{Location, ReferenceType, VirtualMachine}
 import org.scalamock.scalatest.MockFactory

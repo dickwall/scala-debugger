@@ -1,4 +1,5 @@
 package test
+import acyclic.file
 
 import org.scaladebugger.api.utils.Logging
 

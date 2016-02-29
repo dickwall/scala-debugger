@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.traits.watchpoints
+import acyclic.file
 
 import com.sun.jdi.event.ModificationWatchpointEvent
 import org.scaladebugger.api.lowlevel.JDIArgument

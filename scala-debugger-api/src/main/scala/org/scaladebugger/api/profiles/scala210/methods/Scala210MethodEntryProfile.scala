@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.scala210.methods
+import acyclic.file
 
 import org.scaladebugger.api.profiles.pure.methods.PureMethodEntryProfile
 

@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.traits
+import acyclic.file
 
 import org.scaladebugger.api.lowlevel.ManagerContainer
 

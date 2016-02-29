@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.scala211.monitors
+import acyclic.file
 
 import org.scaladebugger.api.profiles.pure.monitors.PureMonitorContendedEnteredProfile
 

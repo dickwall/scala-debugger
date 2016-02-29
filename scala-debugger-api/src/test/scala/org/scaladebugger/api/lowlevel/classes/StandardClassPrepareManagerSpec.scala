@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.classes
+import acyclic.file
 
 import java.util.concurrent.atomic.AtomicInteger
 

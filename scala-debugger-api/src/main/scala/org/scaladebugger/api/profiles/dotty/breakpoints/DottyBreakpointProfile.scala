@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.dotty.breakpoints
+import acyclic.file
 
 import org.scaladebugger.api.profiles.pure.breakpoints.PureBreakpointProfile
 

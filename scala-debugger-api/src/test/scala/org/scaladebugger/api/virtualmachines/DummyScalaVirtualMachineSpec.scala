@@ -1,4 +1,5 @@
 package org.scaladebugger.api.virtualmachines
+import acyclic.file
 
 import org.scaladebugger.api.profiles.traits.DebugProfile
 import org.scalamock.scalatest.MockFactory

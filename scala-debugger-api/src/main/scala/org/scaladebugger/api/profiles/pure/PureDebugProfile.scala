@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.pure
+import acyclic.file
 
 import com.sun.jdi.VirtualMachine
 import org.scaladebugger.api.lowlevel.ManagerContainer
@@ -6,7 +7,7 @@ import org.scaladebugger.api.profiles.pure.breakpoints.PureBreakpointProfile
 import org.scaladebugger.api.profiles.pure.classes.{PureClassUnloadProfile, PureClassPrepareProfile}
 import org.scaladebugger.api.profiles.pure.events.PureEventProfile
 import org.scaladebugger.api.profiles.pure.exceptions.PureExceptionProfile
-import org.scaladebugger.api.profiles.pure.info.PureMiscInfoProfile
+import org.scaladebugger.api.profiles.pure.info.{PureGrabInfoProfile, PureMiscInfoProfile}
 import org.scaladebugger.api.profiles.pure.methods.{PureMethodExitProfile, PureMethodEntryProfile}
 import org.scaladebugger.api.profiles.pure.monitors.{PureMonitorWaitProfile, PureMonitorWaitedProfile, PureMonitorContendedEnterProfile, PureMonitorContendedEnteredProfile}
 import org.scaladebugger.api.profiles.pure.steps.PureStepProfile
@@ -41,6 +42,7 @@ class PureDebugProfile(
   with PureClassUnloadProfile
   with PureEventProfile
   with PureExceptionProfile
+  with PureGrabInfoProfile
   with PureMethodEntryProfile
   with PureMethodExitProfile
   with PureMiscInfoProfile

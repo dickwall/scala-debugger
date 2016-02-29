@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.wrappers
+import acyclic.file
 
 import scala.language.implicitConversions
 
@@ -21,4 +22,8 @@ object Implicits {
   implicit def referenceTypeToWrapper(
     referenceType: ReferenceType
   ): ReferenceTypeWrapper = new ReferenceTypeWrapper(referenceType)
+
+  implicit def virtualMachineToWrapper(
+    virtualMachine: VirtualMachine
+  ): VirtualMachineWrapper = new VirtualMachineWrapper(virtualMachine)
 }

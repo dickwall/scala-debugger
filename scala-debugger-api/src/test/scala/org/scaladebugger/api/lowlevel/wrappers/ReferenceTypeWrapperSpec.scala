@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.wrappers
+import acyclic.file
 
 import com.sun.jdi.{Field, ClassNotPreparedException, ReferenceType}
 import org.scalamock.scalatest.MockFactory

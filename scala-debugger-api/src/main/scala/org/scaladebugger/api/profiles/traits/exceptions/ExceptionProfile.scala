@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.traits.exceptions
+import acyclic.file
 
 import com.sun.jdi.event.ExceptionEvent
 import org.scaladebugger.api.lowlevel.JDIArgument

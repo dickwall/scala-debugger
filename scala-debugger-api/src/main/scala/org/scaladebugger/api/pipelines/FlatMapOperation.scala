@@ -1,4 +1,5 @@
 package org.scaladebugger.api.pipelines
+import acyclic.file
 
 import scala.collection.GenTraversableOnce
 

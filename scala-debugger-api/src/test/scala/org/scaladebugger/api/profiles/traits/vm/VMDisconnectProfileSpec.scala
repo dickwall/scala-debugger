@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.traits.vm
+import acyclic.file
 
 import com.sun.jdi.event.VMDisconnectEvent
 import org.scalamock.scalatest.MockFactory

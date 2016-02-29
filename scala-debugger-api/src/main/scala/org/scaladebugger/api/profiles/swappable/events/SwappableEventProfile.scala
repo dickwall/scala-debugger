@@ -1,10 +1,11 @@
 package org.scaladebugger.api.profiles.swappable.events
+import acyclic.file
 
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.events.EventHandlerInfo
 import org.scaladebugger.api.lowlevel.events.EventType.EventType
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
-import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
+import org.scaladebugger.api.profiles.swappable.SwappableDebugProfileManagement
 import org.scaladebugger.api.profiles.traits.events.EventProfile
 
 import scala.util.Try
@@ -14,7 +15,7 @@ import scala.util.Try
  * invocation to another profile.
  */
 trait SwappableEventProfile extends EventProfile {
-  this: SwappableDebugProfile =>
+  this: SwappableDebugProfileManagement =>
 
   override def onEventWithData(
     eventType: EventType,

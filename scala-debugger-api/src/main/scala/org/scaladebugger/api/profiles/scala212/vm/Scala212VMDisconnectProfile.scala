@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.scala212.vm
+import acyclic.file
 
 import org.scaladebugger.api.profiles.pure.vm.PureVMDisconnectProfile
 

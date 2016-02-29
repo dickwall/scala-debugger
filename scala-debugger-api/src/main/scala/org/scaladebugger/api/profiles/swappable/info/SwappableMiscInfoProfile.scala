@@ -1,6 +1,7 @@
 package org.scaladebugger.api.profiles.swappable.info
+import acyclic.file
+import org.scaladebugger.api.profiles.swappable.SwappableDebugProfileManagement
 
-import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
 import org.scaladebugger.api.profiles.traits.info.MiscInfoProfile
 
 /**
@@ -8,7 +9,7 @@ import org.scaladebugger.api.profiles.traits.info.MiscInfoProfile
  * invocation to another profile.
  */
 trait SwappableMiscInfoProfile extends MiscInfoProfile {
-  this: SwappableDebugProfile =>
+  this: SwappableDebugProfileManagement =>
 
   override def availableLinesForFile(fileName: String): Option[Seq[Int]] = {
     withCurrentProfile.availableLinesForFile(fileName)

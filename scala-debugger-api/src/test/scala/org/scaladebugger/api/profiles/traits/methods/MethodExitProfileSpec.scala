@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.traits.methods
+import acyclic.file
 
 import com.sun.jdi.event.MethodExitEvent
 import org.scaladebugger.api.lowlevel.methods.MethodExitRequestInfo

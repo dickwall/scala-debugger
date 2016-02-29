@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.scala212.classes
+import acyclic.file
 
 import org.scaladebugger.api.profiles.pure.classes.PureClassUnloadProfile
 

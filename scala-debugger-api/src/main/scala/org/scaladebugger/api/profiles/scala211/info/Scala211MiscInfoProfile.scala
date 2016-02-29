@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.scala211.info
+import acyclic.file
 
 import org.scaladebugger.api.profiles.pure.info.PureMiscInfoProfile
 

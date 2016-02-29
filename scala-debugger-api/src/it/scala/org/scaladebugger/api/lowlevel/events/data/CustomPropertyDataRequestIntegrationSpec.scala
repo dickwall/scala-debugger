@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.events.data
+import acyclic.file
 
 import com.sun.jdi.event.BreakpointEvent
 import org.scaladebugger.api.utils.JDITools

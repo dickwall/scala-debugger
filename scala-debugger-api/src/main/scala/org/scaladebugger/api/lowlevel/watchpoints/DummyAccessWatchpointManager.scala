@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.watchpoints
+import acyclic.file
 
 import com.sun.jdi.request.AccessWatchpointRequest
 import org.scaladebugger.api.lowlevel.DummyOperationException

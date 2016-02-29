@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.breakpoints
+import acyclic.file
 
 import com.sun.jdi.{Location, VirtualMachine}
 import com.sun.jdi.request.{EventRequest, BreakpointRequest, EventRequestManager}

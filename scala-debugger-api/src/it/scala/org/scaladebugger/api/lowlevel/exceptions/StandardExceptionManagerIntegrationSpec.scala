@@ -1,4 +1,5 @@
 package org.scaladebugger.api.lowlevel.exceptions
+import acyclic.file
 
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 

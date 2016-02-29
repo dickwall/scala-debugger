@@ -1,4 +1,5 @@
 package org.scaladebugger.api.utils
+import acyclic.file
 
 import scala.collection.mutable.{Map => MutableMap}
 

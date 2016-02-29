@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles
+import acyclic.file
 
 /**
  * Contains constants related to the profiles.

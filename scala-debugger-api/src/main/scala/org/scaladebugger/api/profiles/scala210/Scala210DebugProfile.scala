@@ -1,4 +1,5 @@
 package org.scaladebugger.api.profiles.scala210
+import acyclic.file
 
 import com.sun.jdi.VirtualMachine
 import org.scaladebugger.api.lowlevel.ManagerContainer
@@ -6,7 +7,7 @@ import org.scaladebugger.api.profiles.scala210.breakpoints.Scala210BreakpointPro
 import org.scaladebugger.api.profiles.scala210.classes.{Scala210ClassPrepareProfile, Scala210ClassUnloadProfile}
 import org.scaladebugger.api.profiles.scala210.events.Scala210EventProfile
 import org.scaladebugger.api.profiles.scala210.exceptions.Scala210ExceptionProfile
-import org.scaladebugger.api.profiles.scala210.info.Scala210MiscInfoProfile
+import org.scaladebugger.api.profiles.scala210.info.{Scala210GrabInfoProfile, Scala210MiscInfoProfile}
 import org.scaladebugger.api.profiles.scala210.methods.{Scala210MethodEntryProfile, Scala210MethodExitProfile}
 import org.scaladebugger.api.profiles.scala210.monitors.{Scala210MonitorContendedEnterProfile, Scala210MonitorContendedEnteredProfile, Scala210MonitorWaitProfile, Scala210MonitorWaitedProfile}
 import org.scaladebugger.api.profiles.scala210.steps.Scala210StepProfile
@@ -40,6 +41,7 @@ class Scala210DebugProfile(
   with Scala210ClassUnloadProfile
   with Scala210EventProfile
   with Scala210ExceptionProfile
+  with Scala210GrabInfoProfile
   with Scala210MethodEntryProfile
   with Scala210MethodExitProfile
   with Scala210MiscInfoProfile

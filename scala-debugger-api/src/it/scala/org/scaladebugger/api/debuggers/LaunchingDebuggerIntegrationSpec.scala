@@ -1,4 +1,5 @@
 package org.scaladebugger.api.debuggers
+import acyclic.file
 
 import java.util.concurrent.atomic.AtomicBoolean
 

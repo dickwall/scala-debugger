@@ -1,9 +1,10 @@
 package org.scaladebugger.api.profiles.swappable.monitors
+import acyclic.file
 
 import org.scaladebugger.api.lowlevel.JDIArgument
 import org.scaladebugger.api.lowlevel.monitors.MonitorContendedEnterRequestInfo
 import org.scaladebugger.api.pipelines.Pipeline.IdentityPipeline
-import org.scaladebugger.api.profiles.swappable.SwappableDebugProfile
+import org.scaladebugger.api.profiles.swappable.SwappableDebugProfileManagement
 import org.scaladebugger.api.profiles.traits.monitors.MonitorContendedEnterProfile
 
 import scala.util.Try
@@ -13,7 +14,7 @@ import scala.util.Try
  * redirects the invocation to another profile.
  */
 trait SwappableMonitorContendedEnterProfile extends MonitorContendedEnterProfile {
-  this: SwappableDebugProfile =>
+  this: SwappableDebugProfileManagement =>
 
   override def onMonitorContendedEnterWithData(
     extraArguments: JDIArgument*

@@ -29,6 +29,7 @@ class ManagerContainerSpec extends FunSpec with Matchers
         val info = BreakpointRequestInfo(
           requestId = java.util.UUID.randomUUID().toString,
           isPending = true,
+          isShortFileName = false,
           fileName = "some/file/name",
           lineNumber = 999,
           Seq(mock[JDIRequestArgument])

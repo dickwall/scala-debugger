@@ -25,7 +25,7 @@ trait BreakpointManager {
   def breakpointRequestListById: Seq[String]
 
   /**
-   * Creates and enables a breakpoint on the specified line of the class.
+   * Creates and enables a breakpoint on the specified line of the file.
    *
    * @param requestId The id of the request used for lookup and removal
    * @param fileName The name of the file to set a breakpoint
@@ -43,7 +43,7 @@ trait BreakpointManager {
 
 
   /**
-   * Creates and enables a breakpoint on the specified line of the class.
+   * Creates and enables a breakpoint on the specified line of the file.
    *
    * @param fileName The name of the file to set a breakpoint
    * @param lineNumber The number of the line to break

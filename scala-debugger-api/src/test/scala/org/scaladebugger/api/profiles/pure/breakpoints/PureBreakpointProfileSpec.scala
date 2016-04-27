@@ -44,7 +44,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
     describe("#breakpointRequests") {
       it("should include all active requests") {
         val expected = Seq(
-          BreakpointRequestInfo(TestRequestId, false, "some file", 999)
+          BreakpointRequestInfo(TestRequestId, false, false, "some file", 999)
         )
 
         val mockBreakpointManager = mock[PendingBreakpointSupportLike]
@@ -66,7 +66,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
 
       it("should include pending requests if supported") {
         val expected = Seq(
-          BreakpointRequestInfo(TestRequestId, true, "some file", 999)
+          BreakpointRequestInfo(TestRequestId, true, false, "some file", 999)
         )
 
         val mockBreakpointManager = mock[PendingBreakpointSupportLike]
@@ -88,7 +88,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
 
       it("should only include active requests if pending unsupported") {
         val expected = Seq(
-          BreakpointRequestInfo(TestRequestId, false, "some file", 999)
+          BreakpointRequestInfo(TestRequestId, false, false, "some file", 999)
         )
 
         (mockBreakpointManager.breakpointRequestList _).expects()
@@ -127,6 +127,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName + "other",
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -154,6 +155,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber + 1,
             extraArguments = extraArguments
@@ -180,6 +182,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -212,6 +215,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = false,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -263,6 +267,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName + "other",
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -291,6 +296,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber + 1,
             extraArguments = extraArguments
@@ -319,6 +325,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -345,6 +352,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -378,6 +386,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = false,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -426,6 +435,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -455,6 +465,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = false,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -503,6 +514,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName + "other",
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -530,6 +542,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber + 1,
             extraArguments = extraArguments
@@ -557,6 +570,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = false,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -584,6 +598,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -629,6 +644,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName + "other",
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -656,6 +672,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber + 1,
             extraArguments = extraArguments
@@ -683,6 +700,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -710,6 +728,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = false,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments
@@ -738,6 +757,7 @@ class PureBreakpointProfileSpec extends FunSpec with Matchers
           BreakpointRequestInfo(
             requestId = TestRequestId,
             isPending = true,
+            isShortFileName = false,
             fileName = fileName,
             lineNumber = lineNumber,
             extraArguments = extraArguments

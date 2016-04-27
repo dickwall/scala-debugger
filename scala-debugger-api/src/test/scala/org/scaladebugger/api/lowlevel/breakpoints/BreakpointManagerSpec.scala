@@ -45,6 +45,7 @@ class BreakpointManagerSpec extends FunSpec with Matchers
       it("should invoke createBreakpointRequestWithId") {
         val expected = Success(TestRequestId)
         val testIsPending = false
+        val testIsShortFileName = false
         val testFileName = "some/file/name"
         val testLineNumber = 999
         val testExtraArguments = Seq(stub[JDIRequestArgument])
@@ -56,6 +57,7 @@ class BreakpointManagerSpec extends FunSpec with Matchers
         val info = BreakpointRequestInfo(
           TestRequestId,
           testIsPending,
+          testIsShortFileName,
           testFileName,
           testLineNumber,
           testExtraArguments

@@ -1,15 +1,15 @@
 package org.scaladebugger.api.lowlevel.breakpoints
 import acyclic.file
-
-import com.sun.jdi.request.{EventRequestManager, BreakpointRequest}
+import com.sun.jdi.request.{BreakpointRequest, EventRequestManager}
 import org.scaladebugger.api.lowlevel.classes.ClassManager
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
 import org.scaladebugger.api.lowlevel.requests.properties.{EnabledProperty, SuspendPolicyProperty}
-import org.scaladebugger.api.utils.{MultiMap, Logging}
+import org.scaladebugger.api.utils.{Logging, MultiMap}
 import com.sun.jdi.Location
+import org.scaladebugger.api.lowlevel.requests.misc.{IsSourcePath, ShortName}
 
 import scala.collection.JavaConverters._
-import scala.util.{Try, Failure}
+import scala.util.{Failure, Try}
 
 /**
  * Represents the manager for breakpoint requests.
@@ -49,7 +49,6 @@ class StandardBreakpointManager(
    * @param fileName The name of the file to set a breakpoint
    * @param lineNumber The number of the line to break
    * @param extraArguments Any additional arguments to provide to the request
-   *
    * @return Success(id) if successful, otherwise Failure
    */
   override def createBreakpointRequestWithId(
@@ -58,15 +57,31 @@ class StandardBreakpointManager(
     lineNumber: Int,
     extraArguments: JDIRequestArgument*
   ): Try[String] = {
+    // Determine if provided the short name or full source path
+    val isShortName = (IsSourcePath +: extraArguments).flatMap {
+      case s: ShortName => Some(s)
+      case _            => None
+    }.last.isShortName
+
+    val realFileName = if (isShortName) {
+      // Find the first valid source path that represents the short file name
+      val sourcePath = classManager.allFileNames.find(_.endsWith(fileName))
+
+      if (sourcePath.isEmpty)
+        return Failure(new NoSourcePathFoundException(fileName))
+
+      sourcePath.get
+    } else fileName
+
     // Retrieve the available locations for the specified line
     val locations = classManager
-      .linesAndLocationsForFile(fileName)
+      .linesAndLocationsForFile(realFileName)
       .flatMap(_.get(lineNumber))
       .getOrElse(Nil)
 
     // Exit early if no locations are available
     if (locations.isEmpty)
-      return Failure(NoBreakpointLocationFound(fileName, lineNumber))
+      return Failure(NoBreakpointLocationFound(realFileName, lineNumber))
 
     val arguments = Seq(
       SuspendPolicyProperty.EventThread,
@@ -84,7 +99,10 @@ class StandardBreakpointManager(
       BreakpointRequestInfo(
         requestId,
         isPending,
-        fileName,
+        // TODO: This should always be false since we are grabbing the full
+        //       name, so this property should be removed
+        isShortName,
+        realFileName,
         lineNumber,
         extraArguments
       ),
@@ -100,7 +118,6 @@ class StandardBreakpointManager(
    *
    * @param fileName The name of the file whose line to reference
    * @param lineNumber The number of the line to check for a breakpoint
-   *
    * @return True if a breakpoint exists, otherwise false
    */
   override def hasBreakpointRequest(
@@ -116,7 +133,6 @@ class StandardBreakpointManager(
    * Determines whether or not the breakpoint with the specified id exists.
    *
    * @param requestId The id of the request
-   *
    * @return True if a breakpoint exists, otherwise false
    */
   override def hasBreakpointRequestWithId(requestId: String): Boolean = {
@@ -129,7 +145,6 @@ class StandardBreakpointManager(
    *
    * @param fileName The name of the file whose line to reference
    * @param lineNumber The number of the line to check for breakpoints
-   *
    * @return Some collection of breakpoints for the specified line, or None if
    *         the specified line has no breakpoints
    */
@@ -148,7 +163,6 @@ class StandardBreakpointManager(
    * Returns the collection of breakpoints with the specified id.
    *
    * @param requestId The id of the request
-   *
    * @return Some collection of breakpoints for the specified line, or None if
    *         the specified line has no breakpoints
    */
@@ -162,7 +176,6 @@ class StandardBreakpointManager(
    * Returns the arguments for a breakpoint request with the specified id.
    *
    * @param requestId The id of the request
-   *
    * @return Some breakpoint arguments if found, otherwise None
    */
   override def getBreakpointRequestInfoWithId(
@@ -176,7 +189,6 @@ class StandardBreakpointManager(
    *
    * @param fileName The name of the file to remove the breakpoint
    * @param lineNumber The number of the line to break
-   *
    * @return True if successfully removed breakpoint, otherwise false
    */
   override def removeBreakpointRequest(
@@ -194,7 +206,6 @@ class StandardBreakpointManager(
    * Removes the breakpoint with the specified id.
    *
    * @param requestId The id of the request
-   *
    * @return True if successfully removed breakpoint, otherwise false
    */
   override def removeBreakpointRequestWithId(

@@ -22,7 +22,6 @@ class DummyBreakpointManager extends BreakpointManager {
    * Removes the breakpoint with the specified id.
    *
    * @param requestId The id of the request
-   *
    * @return True if successfully removed breakpoint, otherwise false
    */
   override def removeBreakpointRequestWithId(requestId: String): Boolean = false
@@ -32,7 +31,6 @@ class DummyBreakpointManager extends BreakpointManager {
    *
    * @param fileName The name of the file to remove the breakpoint
    * @param lineNumber The number of the line to break
-   *
    * @return True if successfully removed breakpoint, otherwise false
    */
   override def removeBreakpointRequest(
@@ -44,7 +42,6 @@ class DummyBreakpointManager extends BreakpointManager {
    * Returns the collection of breakpoints with the specified id.
    *
    * @param requestId The id of the request
-   *
    * @return Some collection of breakpoints for the specified line, or None if
    *         the specified line has no breakpoints
    */
@@ -64,7 +61,6 @@ class DummyBreakpointManager extends BreakpointManager {
    *
    * @param fileName The name of the file whose line to reference
    * @param lineNumber The number of the line to check for a breakpoint
-   *
    * @return True if a breakpoint exists, otherwise false
    */
   override def hasBreakpointRequest(
@@ -79,7 +75,6 @@ class DummyBreakpointManager extends BreakpointManager {
    * @param fileName The name of the file to set a breakpoint
    * @param lineNumber The number of the line to break
    * @param extraArguments Any additional arguments to provide to the request
-   *
    * @return Success(id) if successful or pending, otherwise Failure
    */
   override def createBreakpointRequestWithId(
@@ -95,7 +90,6 @@ class DummyBreakpointManager extends BreakpointManager {
    *
    * @param fileName The name of the file whose line to reference
    * @param lineNumber The number of the line to check for breakpoints
-   *
    * @return Some collection of breakpoints for the specified line, or None if
    *         the specified line has no breakpoints
    */
@@ -108,7 +102,6 @@ class DummyBreakpointManager extends BreakpointManager {
    * Returns the information for a breakpoint request with the specified id.
    *
    * @param requestId The id of the request
-   *
    * @return Some breakpoint information if found, otherwise None
    */
   override def getBreakpointRequestInfoWithId(
@@ -119,7 +112,6 @@ class DummyBreakpointManager extends BreakpointManager {
    * Determines whether or not the breakpoint with the specified id exists.
    *
    * @param requestId The id of the request
-   *
    * @return True if a breakpoint exists, otherwise false
    */
   override def hasBreakpointRequestWithId(requestId: String): Boolean = false

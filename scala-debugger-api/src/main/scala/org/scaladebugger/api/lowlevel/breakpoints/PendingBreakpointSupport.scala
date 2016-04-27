@@ -1,7 +1,7 @@
 package org.scaladebugger.api.lowlevel.breakpoints
 import acyclic.file
-
 import org.scaladebugger.api.lowlevel.requests.JDIRequestArgument
+import org.scaladebugger.api.lowlevel.requests.misc.{IsSourcePath, ShortName}
 import org.scaladebugger.api.utils.PendingActionManager
 
 import scala.util.{Success, Try}
@@ -110,7 +110,7 @@ trait PendingBreakpointSupport extends PendingBreakpointSupportLike {
   }
 
   /**
-   * Creates and enables a breakpoint on the specified line of the class. Will
+   * Creates and enables a breakpoint on the specified line of the file. Will
    * also remove any pending breakpoints.
    *
    * @param requestId The id of the request used for lookup and removal
@@ -133,6 +133,33 @@ trait PendingBreakpointSupport extends PendingBreakpointSupportLike {
       extraArguments: _*
     )
 
+    invokeCreateBreakpoint(
+      createBreakpoint,
+      requestId,
+      fileName,
+      lineNumber,
+      extraArguments
+    )
+  }
+
+  /**
+   * Creates and enables a breakpoint using the given function, or queues
+   * up the function to be run when possible if pending is enabled.
+   *
+   * @param requestId The id of the request used for lookup and removal
+   * @param fileName The name of the file to set a breakpoint
+   * @param lineNumber The number of the line to break
+   * @param extraArguments Any additional arguments to provide to the request
+   *
+   * @return Success(id) if successful or pending, otherwise Failure
+   */
+  private def invokeCreateBreakpoint(
+    createBreakpoint: () => Try[String],
+    requestId: String,
+    fileName: String,
+    lineNumber: Int,
+    extraArguments: Seq[JDIRequestArgument]
+  ): Try[String] = {
     val result = createBreakpoint()
 
     result.recoverWith {
@@ -142,6 +169,12 @@ trait PendingBreakpointSupport extends PendingBreakpointSupportLike {
           BreakpointRequestInfo(
             requestId,
             isPending = true,
+            // TODO: This duplicates the logic in the BreakpointManager, so
+            //       it needs to be refactored into something common
+            isShortFileName = (IsSourcePath +: extraArguments).flatMap {
+              case s: ShortName => Some(s)
+              case _            => None
+            }.last.isShortName,
             fileName,
             lineNumber,
             extraArguments

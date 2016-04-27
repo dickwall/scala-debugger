@@ -21,6 +21,7 @@ object RequestInfoBuilder {
   // TEST CONSTANTS
   val TestRequestId: String = java.util.UUID.randomUUID().toString
   val TestIsPending: Boolean = false
+  val TestIsShortFileName: Boolean = false
   val TestFileName: String = "some/file/name.scala"
   val TestLineNumber: Int = 999
   val TestClassName: String = "some.class.name"
@@ -44,6 +45,7 @@ object RequestInfoBuilder {
   def newBreakpointRequestInfo(): BreakpointRequestInfo = BreakpointRequestInfo(
     requestId       = TestRequestId,
     isPending       = TestIsPending,
+    isShortFileName = TestIsShortFileName,
     fileName        = TestFileName,
     lineNumber      = TestLineNumber,
     extraArguments  = TestExtraArguments

@@ -1,18 +1,18 @@
 package org.scaladebugger.api.lowlevel.breakpoints
 import acyclic.file
-
-import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean}
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
 import com.sun.jdi.event.BreakpointEvent
 import org.scaladebugger.api.utils.JDITools
 import org.scalatest.concurrent.Eventually
-import org.scalatest.time.{Seconds, Milliseconds, Span}
+import org.scalatest.time.{Milliseconds, Seconds, Span}
 import org.scalatest.{FunSpec, Matchers, ParallelTestExecution}
 import org.scaladebugger.api.lowlevel.events.EventType
 import org.scaladebugger.api.profiles.ProfileManager
 import org.scaladebugger.api.virtualmachines.DummyScalaVirtualMachine
 import test.{Constants, TestUtilities, VirtualMachineFixtures}
 import EventType._
+import org.scaladebugger.api.lowlevel.requests.misc.IsShortName
 
 class StandardBreakpointManagerIntegrationSpec extends FunSpec with Matchers
   with ParallelTestExecution with VirtualMachineFixtures
@@ -123,6 +123,50 @@ class StandardBreakpointManagerIntegrationSpec extends FunSpec with Matchers
       // Queue up our breakpoints
       breakpointManager.createBreakpointRequest(testFile, firstBreakpointLine)
       breakpointManager.createBreakpointRequest(testFile, secondBreakpointLine)
+
+      eventManager.addResumingEventHandler(BreakpointEventType, e => {
+        val breakpointEvent = e.asInstanceOf[BreakpointEvent]
+        val location = breakpointEvent.location()
+        val fileName = location.sourcePath()
+        val lineNumber = location.lineNumber()
+
+        logger.debug(s"Reached breakpoint: $fileName:$lineNumber")
+        if (fileName == testFile) {
+          if (lineNumber == firstBreakpointLine) firstBreakpoint.set(true)
+          if (lineNumber == secondBreakpointLine) secondBreakpoint.set(true)
+        }
+      })
+
+      withVirtualMachine(testClass, pendingScalaVirtualMachines = Seq(s)) { (s) =>
+        logTimeTaken(eventually {
+          // NOTE: Using asserts to provide more helpful failure messages
+          assert(firstBreakpoint.get(), "First breakpoint not reached!")
+          assert(secondBreakpoint.get(), "Second breakpoint not reached!")
+        })
+      }
+    }
+
+    it("should be able to set breakpoints using the short file name") {
+      val testClass = "org.scaladebugger.test.breakpoints.DelayedInit"
+      val testFile = "DelayedInit.scala"
+
+      val firstBreakpointLine = 10
+      val firstBreakpoint = new AtomicBoolean(false)
+
+      val secondBreakpointLine = 11
+      val secondBreakpoint = new AtomicBoolean(false)
+
+      val s = DummyScalaVirtualMachine.newInstance()
+
+      import s.lowlevel._
+
+      // Queue up our breakpoints
+      breakpointManager.createBreakpointRequest(
+        testFile, firstBreakpointLine, IsShortName
+      )
+      breakpointManager.createBreakpointRequest(
+        testFile, secondBreakpointLine, IsShortName
+      )
 
       eventManager.addResumingEventHandler(BreakpointEventType, e => {
         val breakpointEvent = e.asInstanceOf[BreakpointEvent]
